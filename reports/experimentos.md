@@ -146,3 +146,20 @@ Operacionalización (fijada por el asistente antes de ejecutar; ajustable):
 - "Cerca de 0,5" significa que el umbral elegido está entre 0,40 y 0,60.
 - Regla de elección con sesgo hacia umbrales bajos: entre los admisibles, se toma el umbral más bajo cuya precisión media esté a menos de 0,002 de la máxima (0,002 es la desviación entre pliegues observada en el experimento 5, es decir, diferencias dentro del ruido).
 - Precaución: el umbral se elige con las mismas predicciones fuera de muestra con que se eligió la configuración; el modelo final se reajusta con todo el entrenamiento y sus probabilidades pueden diferir algo de las de los modelos de pliegue (entrenados con el 80 %). La prueba mostrará si el umbral se sostiene.
+
+### Resultados del experimento 6 (predicciones fuera de muestra, 5 pliegues, media por pliegue)
+
+| Umbral | Recall | Recall mínimo (pliegue) | Precisión | Falsas alarmas por pliegue |
+|---|---|---|---|---|
+| 0,30 | 0,9915 | 0,9906 | 0,9419 | 1459 |
+| 0,40 | 0,9850 | 0,9838 | 0,9530 | 1160 |
+| 0,50 | 0,9769 | 0,9745 | 0,9619 | 923 |
+| 0,60 | 0,9663 | 0,9636 | 0,9707 | 696 |
+| 0,68 | 0,9550 | 0,9534 | 0,9770 | 536 |
+| 0,70 | 0,9516 | 0,9501 | 0,9789 | 490 |
+
+- La precisión sube de forma continua con el umbral y el recall baja; el piso de 0,95 es lo que frena la subida. El umbral admisible más alto es 0,70 (recall mínimo por pliegue 0,9501, al borde del piso) y es también el de máxima precisión (0,9789).
+- Con la regla fijada (el más bajo dentro de 0,002 de la precisión máxima): **umbral 0,68**, precisión 0,977, recall 0,955.
+- Hipótesis: **no se cumple.** El umbral óptimo con el piso de 0,95 no está cerca de 0,5 (fuera del rango 0,40–0,60), sino cerca de 0,7. Con 0,5 el recall es 0,977, es decir, mucho más alto que el piso, y se pagan unas 390 falsas alarmas más por pliegue (923 frente a 536) que con 0,68. El umbral 0,5 solo sería el óptimo con un piso de recall de ~0,977.
+- El sesgo hacia umbrales bajos es una decisión de costos, no estadística: cada paso hacia abajo compra recall con falsas alarmas (de 0,68 a 0,50: +2,2 puntos de recall a cambio de +387 falsas alarmas por pliegue).
+- Cautela: 0,68 y 0,70 dejan muy poco margen sobre el piso (recall mínimo 0,953 y 0,950), y el modelo final reajustado con todo el entrenamiento puede dar probabilidades algo distintas. No se usó la prueba.
