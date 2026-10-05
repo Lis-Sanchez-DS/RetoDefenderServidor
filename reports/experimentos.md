@@ -7,7 +7,7 @@ Todos los experimentos usan la misma partición de entrenamiento/validación (bl
 - Cambio: respecto a la línea base, un modelo real con solo variables numéricas.
 
 ## Experimento 2: regresión logística con variables categóricas codificadas
-- Hipótesis: agregar `service`, `state` y `proto` (one-hot, `proto` con categoría infrecuente) mejora el macro-F1 y reduce los falsos positivos respecto al experimento 1, porque estas variables concentran mucha información sobre la clase (p. ej. `state` INT 93 % ataques, `ssh` 0,8 %). Si no mejora, la codificación no está aportando.
+- Hipótesis: las variables categóricas (`service`, `state` y `proto`, con one-hot y `proto` con categoría infrecuente) impactan de forma muy marcada los resultados en validación. El objetivo es comprobar si vale la pena conservarlas.
 - Cambio: respecto al experimento 1, solo se agregan las tres variables categóricas codificadas.
 
 ## Resultados (validación, umbral 0,5, 35.000 filas: 10.166 normales y 24.834 ataques)
@@ -20,7 +20,7 @@ Todos los experimentos usan la misma partición de entrenamiento/validación (bl
 
 ## Conclusiones
 - Experimento 1: la hipótesis se cumple. Sube el macro-F1 de 0,415 a 0,918 y la tasa de falsos positivos baja de 1,00 a 0,19, con el recall casi intacto (0,987).
-- Experimento 2: la hipótesis se cumple, pero la mejora es modesta: macro-F1 +0,009, falsos positivos 1.935 → 1.719 (-11 %), falsos negativos 326 → 307, y el ROC-AUC sube de 0,970 a 0,986. La codificación funciona (el modelo la usa y mejora el orden de las probabilidades), aunque con umbral 0,5 se nota poco en las métricas de decisión. La mejora mayor en AUC que en macro-F1 sugiere que el umbral puede ajustarse después.
+- Experimento 2: la hipótesis (impacto muy marcado en validación) no se cumple del todo. Las variables categóricas sí ayudan al modelo a clasificar (macro-F1 +0,009, falsos positivos 1.935 → 1.719, un 11 % menos, falsos negativos 326 → 307, ROC-AUC de 0,970 a 0,986), pero no dominan el resultado en validación: el modelo con solo numéricas ya llega a 0,918 de macro-F1. Decisión: por ahora se conservan, porque ayudan y la codificación funciona, y se revisará con otros modelos y con el ajuste del umbral.
 - Aún con las categóricas, el 17 % del tráfico normal se marca como ataque; con el criterio de que un ataque no detectado cuesta más, es un punto de partida aceptable, pero hay que bajar esa cifra.
 
 ## Precauciones
