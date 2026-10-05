@@ -13,12 +13,10 @@ mlartifacts/
 mlflow.db
 .prefect/
 
-# Datos y modelos los versiona DVC, no Git
-/data/raw/*
+# Datos y modelos los versiona DVC, no Git (DVC agrega sus propias reglas)
+/data/**/*.csv
 /data/processed/*
 /models/*
-!/data/raw/.gitkeep
-!/data/raw/*.dvc
 !/data/processed/.gitkeep
 !/models/.gitkeep
 

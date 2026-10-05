@@ -14,7 +14,7 @@ python3 -m venv .venv
 
 ## Estructura
 - `src/pipeline/` — flujo de Prefect (preparar → entrenar → comparar → registrar)
-- `data/raw`, `data/processed`, `models/` — versionados con DVC (no con Git)
+- `data/raw/unsw-nb15/` (`particion_oficial/`, `completo/`, `metadatos/`), `data/processed`, `models/` — versionados con DVC (no con Git)
 - `params.yaml` — configuración central
 - `reports/` — tabla de experimentos y decisión final
 - `notebooks/` — exploración

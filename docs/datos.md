@@ -25,16 +25,21 @@
 5. Sarhan, M. et al. "NetFlow Datasets for Machine Learning-Based Network Intrusion Detection Systems." BDTA 2020, Springer.
 
 ## Versión utilizada
-Archivos descargados manualmente de la carpeta oficial de UNSW el 5 de octubre de 2026 (página actualizada por última vez el 2 de junio de 2021). Se guardan en `data/raw/` y los versiona DVC (archivos `.dvc`).
+Archivos descargados manualmente de la carpeta oficial de UNSW el 5 de octubre de 2026 (página actualizada por última vez el 2 de junio de 2021). Viven en `data/raw/unsw-nb15/` y los versiona DVC (archivos `.dvc`, uno por CSV).
 
-| Archivo | Filas de datos | Tamaño (bytes) | SHA-256 |
-|---|---|---|---|
-| `UNSW_NB15_training-set.csv` | 175.341 | 32.293.018 | `bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa` |
-| `UNSW_NB15_testing-set.csv` | 82.332 | 15.380.800 | `734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559` |
-| `NUSW-NB15_features.csv` | 49 (descripción de variables) | 4.044 | `c55f19cceebb6360dc50f44f8a5f246ccefbcf8a6c604ac1ad46e643869cafce` |
-| `NUSW-NB15_GT.csv` | 188.913 | 86.426.111 | `6d27542cb6457db599e0a78274ac141fec0296531f00ac5569551a276c5ab1a8` |
+| Carpeta | Archivo | Filas de datos | Tamaño (bytes) | SHA-256 |
+|---|---|---|---|---|
+| `particion_oficial/` | `UNSW_NB15_training-set.csv` | 175.341 | 32.293.018 | `bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa` |
+| `particion_oficial/` | `UNSW_NB15_testing-set.csv` | 82.332 | 15.380.800 | `734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559` |
+| `completo/` | `UNSW-NB15_1.csv` | sin encabezado | 168.979.718 | `7d851bbeabd27894ce39c8e78835c73341fc946652fb7743b9eff193b55eb511` |
+| `completo/` | `UNSW-NB15_2.csv` | sin encabezado | 165.221.021 | `6130ad02873cc6069ae695cf2844f2e8c2e9a9a1b7532dd82ab8f202757cacf8` |
+| `completo/` | `UNSW-NB15_3.csv` | sin encabezado | 154.588.103 | `ae990a96c3dfcd425ce2801aadb1727a34d5e0ae6d8215dbcdae60dedfaef640` |
+| `completo/` | `UNSW-NB15_4.csv` | sin encabezado | 97.588.754 | `cdf563692d51d405541dd659ddcdad9fa01f001f05fe9fc4b67f00ca12fbc96a` |
+| `metadatos/` | `NUSW-NB15_features.csv` | descripción de variables | 4.044 | `c55f19cceebb6360dc50f44f8a5f246ccefbcf8a6c604ac1ad46e643869cafce` |
+| `metadatos/` | `NUSW-NB15_GT.csv` | 188.913 | 86.426.111 | `6d27542cb6457db599e0a78274ac141fec0296531f00ac5569551a276c5ab1a8` |
+| `metadatos/` | `UNSW-NB15_LIST_EVENTS.csv` | lista de eventos | 4.639 | `5b40f8128e2c87e691157c76debde04c328b0eb66bab97f1e7e17625f84497f2` |
 
-Las filas de entrenamiento y prueba coinciden con las cifras publicadas por los autores. Los cuatro CSV crudos (`UNSW-NB15_1..4.csv`) no se descargaron por ahora.
+Las filas de entrenamiento y prueba coinciden con las cifras publicadas por los autores.
 
 ## Limitaciones conocidas (a verificar en la exploración)
 Benchmark histórico de laboratorio (2015): no demuestra eficacia sobre redes actuales.
