@@ -1,0 +1,8 @@
+# Central configuration; filled in as decisions are made.
+seed: 42
+data:
+  dataset: UNSW-NB15
+  version: TBD   # document source/version once downloaded
+split:
+  test_size: 0.2
+  val_size: 0.2

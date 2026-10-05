@@ -1,0 +1,22 @@
+# Course material (not redistributed)
+guia-conceptual-defiende-servidor-2026II.pdf
+
+# Environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Experiment tracking / orchestration local state
+mlruns/
+mlartifacts/
+mlflow.db
+.prefect/
+
+# Data and models are tracked by DVC, not Git
+/data/raw/*
+/data/processed/*
+/models/*
+!/data/raw/.gitkeep
+!/data/processed/.gitkeep
+!/models/.gitkeep
