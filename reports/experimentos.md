@@ -178,3 +178,34 @@ Expectativa (del asistente, anotada antes de ver el resultado):
 - Tasa de falsos positivos claramente mayor que en validación (0,067), probablemente entre 0,10 y 0,25, y por tanto precisión más baja (~0,85 a 0,93; además la prevalencia de ataques es distinta: 55 % en la prueba frente a ~68 % en el entrenamiento).
 - El número de falsos positivos no es comparable en bruto: la prueba tiene 82 332 filas y cada pliegue ~35 000. Se comparan tasas y se muestra el conteo por cada 10 000 filas.
 - Esta evaluación no se usa para cambiar el modelo ni el umbral.
+
+### Resultados de la evaluación final en la prueba (única; modelo `cv-grupos-xgboost-optuna`, umbral 0,6)
+
+Prueba: 82 327 filas (45 329 ataques, 36 998 normales). Validación: media de los 5 pliegues por grupos (± desviación entre pliegues), mismo umbral. Tabla completa en `reports/test_vs_validacion.csv`; ejecución `test-cv-grupos-xgboost-optuna` en MLflow (etapa `evaluacion_test`).
+
+| Métrica | Validación (media ± desv.) | Prueba |
+|---|---|---|
+| Recall | 0,966 ± 0,002 | **0,974** |
+| Precisión | 0,971 ± 0,002 | **0,845** |
+| Tasa de falsos positivos | 0,062 ± 0,004 | **0,219** |
+| Macro-F1 | 0,951 ± 0,003 | 0,884 |
+| Exactitud (accuracy) | 0,957 ± 0,002 | 0,888 |
+| Coeficiente de Matthews (MCC) | 0,902 ± 0,006 | 0,780 |
+| ROC-AUC | 0,994 | 0,983 |
+| PR-AUC | 0,997 | 0,988 |
+| Falsos positivos (conteo) | 696 por pliegue (~11 200 normales) | 8 098 (36 998 normales) |
+| Falsos positivos por 10 000 filas | 198 | 984 |
+| Falsos negativos (conteo) | 805 por pliegue (~23 900 ataques) | 1 166 (45 329 ataques) |
+| Falsos negativos por 10 000 filas | 230 | 142 |
+
+Matriz de confusión en la prueba: TN 28 900, FP 8 098, FN 1 166, TP 44 163.
+
+Recall por familia de ataque en la prueba: Generic 1,000 (18 871), Worms 1,000 (44), Backdoor 1,000 (583), Reconnaissance 0,999 (3 495), DoS 0,999 (4 089), Exploits 0,993 (11 131), Shellcode 0,989 (378), Analysis 0,963 (677), **Fuzzers 0,827 (6 061)**.
+
+Lectura:
+- **Expectativa frente al resultado.** Acerté en que habría deterioro claro de las falsas alarmas (tasa 0,219, dentro del rango 0,10–0,25 previsto) y en la precisión baja (0,845, algo por debajo del rango 0,85–0,93). Me equivoqué en el recall: no cayó, subió (0,974 frente a 0,966), así que el piso de 0,95 se cumple en la prueba. (Nota: en la expectativa escribí 0,067 para la tasa de falsos positivos de validación; el valor correcto de la media por pliegue es 0,062.)
+- **El problema de la prueba son las falsas alarmas, no los ataques perdidos.** Casi una de cada cinco filas normales (21,9 %, frente a 6,2 %) se marca como ataque. Es coherente con el cambio de condiciones (la captura de enero no está en el entrenamiento), pero esto no se ha demostrado aquí: no se separó por sesión ni se inspeccionaron las falsas alarmas.
+- **El recall más alto no prueba mejor generalización.** La mezcla de ataques de la prueba es distinta: Generic es el 42 % de los ataques (recall 1,000) y el entrenamiento tiene proporciones distintas. Con otra mezcla, el recall global cambia aunque el modelo no cambie. El punto débil real es **Fuzzers (recall 0,827)** y, en menor medida, Analysis (0,963).
+- **La precisión también depende de la prevalencia** (55 % de ataques en la prueba frente a 68 % en entrenamiento); con más normales, las mismas falsas alarmas pesan más. Por eso el MCC y la tasa de falsos positivos son más justos para comparar que la precisión.
+- **Las separaciones se mantienen** (ROC-AUC 0,983, PR-AUC 0,988): el modelo ordena bien, y el umbral 0,6 no está calibrado para las condiciones de la prueba. No se cambia el umbral tras ver este resultado (se registra como limitación; la prueba no se usa para ajustar).
+- **Comparación con la regresión logística** (umbral 0,5, solo como referencia): tasa de falsos positivos 0,392, precisión 0,753, macro-F1 0,795 frente a 0,219, 0,845, 0,884 de XGBoost con Optuna.
