@@ -209,3 +209,9 @@ Lectura:
 - **La precisión también depende de la prevalencia** (55 % de ataques en la prueba frente a 68 % en entrenamiento); con más normales, las mismas falsas alarmas pesan más. Por eso el MCC y la tasa de falsos positivos son más justos para comparar que la precisión.
 - **Las separaciones se mantienen** (ROC-AUC 0,983, PR-AUC 0,988): el modelo ordena bien, y el umbral 0,6 no está calibrado para las condiciones de la prueba. No se cambia el umbral tras ver este resultado (se registra como limitación; la prueba no se usa para ajustar).
 - **Comparación con la regresión logística** (umbral 0,5, solo como referencia): tasa de falsos positivos 0,392, precisión 0,753, macro-F1 0,795 frente a 0,219, 0,845, 0,884 de XGBoost con Optuna.
+
+### Hipótesis del usuario sobre la prueba (añadida después de ver el resultado)
+
+Hipótesis del usuario: en la prueba todas las métricas (precisión y recall) bajarían aproximadamente lo mismo. **Nota de procedimiento:** el usuario la aportó después de conocerse el resultado de la prueba, así que no cuenta como una hipótesis previa; se registra por completitud y su veredicto es el que sigue.
+
+**Veredicto: no se cumple.** Cambios de validación a prueba: recall +0,008 (sube), precisión −0,126, tasa de falsos positivos +0,157, macro-F1 −0,067, MCC −0,122, exactitud −0,070. El deterioro no es parejo: se concentra en la precisión (falsas alarmas) y el recall no baja. Es decir, el modelo sigue detectando los ataques pero marca como ataque mucho más tráfico normal.
