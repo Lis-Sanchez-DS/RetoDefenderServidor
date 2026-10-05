@@ -52,3 +52,15 @@ Ambos modelos (regresión logística y XGBoost) se entrenan con los mismos plieg
 
 ## Piso de recall elevado a 0,95
 Desde este punto, el piso de recall del criterio "mayor precisión con recall mínimo" pasa de 0,90 a **0,95** (decisión del equipo). Los experimentos 1 a 4 se evaluaron con el piso de 0,90 y así se conservan; la columna `precision_con_recall_090` de sus ejecuciones sigue siendo válida, y desde la búsqueda de hiperparámetros se registra también `precision_con_recall_095`. El recall sigue siendo la prioridad principal por el criterio de costo; el piso puede volver a subirse.
+
+## Búsqueda de hiperparámetros con Optuna (experimento 5)
+- Se usó optimización bayesiana (Optuna, TPE con semilla 42) con poda (MedianPruner) en lugar de búsqueda en rejilla o aleatoria: el espacio tiene 8 dimensiones y cada prueba cuesta ~1 minuto, así que conviene aprovechar los resultados previos.
+- Objetivo: precisión con recall ≥ 0,95 por pliegue (promedio), sobre los pliegues por grupos del experimento 4. 50 pruebas (46 completas, 4 podadas, 42 min).
+- Resultado: la mejor configuración reduce las falsas alarmas un 12 % (534 a 470 por pliegue), por debajo del 20 % fijado de antemano; la hipótesis no se cumple con ese criterio. El paisaje es plano y las mejores pruebas están en el borde del espacio (profundidad 9–10). Se usa igualmente como modelo candidato porque no es peor y tiene el mejor resultado en validación.
+- Detalle y tablas: `reports/experimentos.md`.
+
+## Umbral de decisión: 0,6 (experimento 6)
+- Se eligió con las predicciones fuera de muestra del modelo de Optuna, nunca con la prueba.
+- El umbral que maximiza la precisión con recall ≥ 0,95 es ~0,7 (el piso de recall es el que frena la subida de precisión). La hipótesis de que sería ~0,5 no se cumplió.
+- Se elige **0,6** por el criterio de costos (una falsa alarma cuesta menos que un ataque sin detectar): subir de 0,6 a 0,68 solo gana 0,006 de precisión y deja un margen mínimo sobre el piso. Con 0,6: recall fuera de muestra 0,966 y ~696 falsas alarmas por pliegue.
+- Pendiente: evaluar una sola vez en la prueba con este umbral.
