@@ -25,6 +25,7 @@ from src.datos import cargar, pliegues_por_bloques, pliegues_por_grupos, separar
 from src.preprocesamiento import columnas_numericas, construir_preprocesamiento
 
 PISO_RECALL = 0.90
+PISO_RECALL_NUEVO = 0.95  # desde la búsqueda de hiperparámetros (ver docs/decisiones.md)
 
 MODELOS = {
     "cv-regresion-logistica": dict(
@@ -51,6 +52,19 @@ def precision_con_recall_minimo(y, prob, piso=PISO_RECALL):
         return float("nan"), float("nan")
     i = np.argmax(np.where(ok, precision[:-1], -1))
     return float(precision[i]), float(umbrales[i])
+
+
+def punto_con_recall_minimo(y, prob, piso):
+    """Mejor punto con recall >= piso: precisión, umbral, falsos positivos y su tasa."""
+    precision, recall, umbrales = precision_recall_curve(y, prob)
+    ok = recall[:-1] >= piso
+    if not ok.any():
+        return dict(precision=float("nan"), umbral=float("nan"), fp=float("nan"), fpr=float("nan"))
+    i = np.argmax(np.where(ok, precision[:-1], -1))
+    tp = recall[i] * float(np.sum(y))
+    fp = tp * (1 - precision[i]) / precision[i]
+    return dict(precision=float(precision[i]), umbral=float(umbrales[i]), fp=float(fp),
+                fpr=float(fp / np.sum(np.asarray(y) == 0)))
 
 
 def construir(cfg, X, seed):
@@ -89,6 +103,8 @@ def ejecutar(nombre, cfg, X, y, pliegues, params, regimen="bloques"):
             r["roc_auc"] = roc_auc_score(yv, prob)
             r["pr_auc"] = average_precision_score(yv, prob)
             r["precision_con_recall_090"], r["umbral_para_recall_090"] = precision_con_recall_minimo(yv, prob)
+            p95 = punto_con_recall_minimo(yv, prob, PISO_RECALL_NUEVO)
+            r["precision_con_recall_095"], r["fp_con_recall_095"], r["fpr_con_recall_095"] = p95["precision"], p95["fp"], p95["fpr"]
             oof.loc[oof.index[i_val], ["prob", "pliegue"]] = np.column_stack([prob, np.full(len(prob), k)])
             filas.append(r)
             mlflow.log_metrics({f"pliegue_{k}_{m}": float(v) for m, v in r.items()
@@ -96,7 +112,8 @@ def ejecutar(nombre, cfg, X, y, pliegues, params, regimen="bloques"):
         d = pd.DataFrame(filas)
         resumen = {}
         for m in ["recall", "precision", "tasa_falsos_positivos", "macro_f1", "roc_auc", "pr_auc",
-                  "precision_con_recall_090", "umbral_para_recall_090"]:
+                  "precision_con_recall_090", "umbral_para_recall_090",
+                  "precision_con_recall_095", "fp_con_recall_095", "fpr_con_recall_095"]:
             resumen[f"{m}_media"], resumen[f"{m}_std"] = float(d[m].mean()), float(d[m].std())
         resumen["fp_media"], resumen["fn_media"] = float(d.fp.mean()), float(d.fn.mean())
         mlflow.log_metrics(resumen)

@@ -64,3 +64,15 @@ def test_pliegues_por_grupos_no_separan_copias():
     for tr, val in pliegues:
         assert set(clave.iloc[tr]).isdisjoint(set(clave.iloc[val]))
     assert sorted(np.concatenate([v for _, v in pliegues])) == list(range(2000))
+
+
+def test_punto_con_recall_minimo_respeta_el_piso():
+    import numpy as np
+    from src.validacion_cruzada import punto_con_recall_minimo
+
+    y = np.array([1] * 90 + [0] * 10)
+    prob = np.r_[np.linspace(0.6, 0.99, 90), np.linspace(0.01, 0.7, 10)]
+    r = punto_con_recall_minimo(y, prob, 0.95)
+    pred = prob >= r["umbral"]
+    assert (pred & (y == 1)).sum() / 90 >= 0.95
+    assert 0 <= r["fpr"] <= 1
