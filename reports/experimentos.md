@@ -81,3 +81,23 @@ Precauciones:
 - Contexto: ver `docs/duplicados.md`. Se repite el experimento 3 con 5 pliegues en los que las filas con el mismo vector de entrada van al mismo pliegue. Mismas variables, mismo preprocesamiento, mismos modelos y mismos hiperparámetros.
 - Hipótesis (formulada por el asistente antes de entrenar): al quitar la fuga por copias, el recall y el macro-F1 bajarán respecto a los pliegues por bloques, sobre todo el recall de los ataques con muchas copias; las falsas alarmas cambiarán poco, porque casi ninguna fila normal tiene gemela; y XGBoost seguirá por encima de la regresión logística en la precisión con recall ≥ 0,90, aunque la diferencia puede reducirse.
 - Criterio: igual que el experimento 3 (mayor precisión con recall ≥ 0,90; se vigilan macro-F1, tasa de falsos positivos y ROC-AUC). El umbral aún no se elige.
+
+### Resultados del experimento 4 (5 pliegues conscientes de grupos, media ± desviación entre pliegues)
+
+| Métrica | Reg. logística (grupos) | XGBoost (grupos) | Reg. logística (bloques, exp. 3) | XGBoost (bloques, exp. 3) |
+|---|---|---|---|---|
+| Precisión máx. con recall ≥ 0,90 | 0,973 ± 0,002 | **0,992 ± 0,001** | 0,969 ± 0,008 | 0,985 ± 0,008 |
+| Precisión (umbral 0,5) | 0,922 ± 0,002 | **0,960 ± 0,002** | 0,920 ± 0,014 | 0,946 ± 0,017 |
+| Recall (umbral 0,5) | **0,988 ± 0,001** | 0,976 ± 0,001 | 0,988 ± 0,002 | 0,977 ± 0,003 |
+| Tasa de falsos positivos | 0,178 ± 0,004 | **0,086 ± 0,003** | 0,185 ± 0,031 | 0,119 ± 0,027 |
+| Macro-F1 | 0,922 ± 0,001 | **0,949 ± 0,002** | 0,919 ± 0,010 | 0,936 ± 0,012 |
+| ROC-AUC | 0,984 ± 0,001 | **0,993 ± 0,000** | 0,982 ± 0,003 | 0,990 ± 0,003 |
+| Falsas alarmas por pliegue | 1.989 | **963** | 2.033 | 1.319 |
+| Ataques no detectados por pliegue | **282** | 576 | 295 | 559 |
+
+Conclusiones:
+- La hipótesis del experimento 4 no se cumple: al separar las copias exactas, el recall no baja (0,988 y 0,976, igual que con bloques) y el macro-F1 y las falsas alarmas mejoran un poco, sobre todo en XGBoost (tasa de falsos positivos 0,119 → 0,086). Sí se cumple que XGBoost sigue por encima: precisión con recall ≥ 0,90 de 0,992 frente a 0,973, en los 5 pliegues.
+- Las desviaciones entre pliegues caen mucho (por ejemplo 0,017 → 0,002 en la precisión de XGBoost). Una causa probable es que los pliegues estratificados tienen todos la misma mezcla de clases, mientras que los de bloques tenían mezclas distintas.
+- No se debe concluir que las copias no importan: quitar las copias exactas entre pliegues no elimina las filas vecinas parecidas (no idénticas), y en esta partición esas filas pueden estar en entrenamiento. Lo más probable es que la mejora en falsas alarmas venga de que las ráfagas de tráfico normal ya no quedan completas fuera del entrenamiento, como ocurría con los bloques; no se ha comprobado. Por eso estos pliegues no son necesariamente más fiables que los de bloques: eliminan un tipo de fuga y dejan otro.
+- Las cifras de validación siguen siendo optimistas respecto a la prueba (la regresión logística tuvo macro-F1 0,795 en prueba frente a 0,927 en validación).
+- Trazabilidad: ejecuciones `cv-grupos-regresion-logistica` y `cv-grupos-xgboost` en MLflow (modelos registrados con esos nombres, versión 1; etiqueta `regimen_pliegues=grupos`), código `.venv/bin/python -m src.validacion_cruzada --grupos`, modelos en `models/cv-grupos-*.joblib` y predicciones fuera de muestra en `data/processed/oof_cv-grupos-*.csv`, versionados con DVC.

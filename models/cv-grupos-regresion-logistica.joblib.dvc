@@ -1,0 +1,5 @@
+outs:
+- md5: 03ac37a63edc2705301a9bbd3071898a
+  size: 10081
+  hash: md5
+  path: cv-grupos-regresion-logistica.joblib
