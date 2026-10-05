@@ -34,3 +34,19 @@ def dividir_entrenamiento_validacion(df, val_size=0.2, tamano_bloque=500, seed=4
     en_val = rng.choice(ids, size=int(round(len(ids) * val_size)), replace=False)
     mascara = np.isin(bloque, en_val)
     return df[~mascara], df[mascara]
+
+
+def pliegues_por_bloques(n_filas, n_pliegues=5, tamano_bloque=500, seed=42):
+    """Validación cruzada que conserva el orden: bloques contiguos completos por pliegue.
+
+    Devuelve una lista de (índices_entrenamiento, índices_validación) sobre posiciones.
+    """
+    from sklearn.model_selection import KFold
+
+    bloque = np.arange(n_filas) // tamano_bloque
+    ids = np.unique(bloque)
+    pliegues = []
+    for tr_b, val_b in KFold(n_pliegues, shuffle=True, random_state=seed).split(ids):
+        en_val = np.isin(bloque, ids[val_b])
+        pliegues.append((np.where(~en_val)[0], np.where(en_val)[0]))
+    return pliegues

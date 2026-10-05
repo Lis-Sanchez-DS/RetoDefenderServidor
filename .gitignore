@@ -18,6 +18,7 @@ mlflow.db
 /data/processed/*
 /models/*
 !/data/processed/.gitkeep
+!/data/processed/*.dvc
 !/models/.gitkeep
 !/models/*.dvc
 

@@ -1,0 +1,5 @@
+outs:
+- md5: cb4f3d1f4b298fd19c2af29b88f809e3
+  size: 5271090
+  hash: md5
+  path: oof_cv-regresion-logistica.csv

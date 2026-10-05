@@ -37,3 +37,16 @@ def test_preprocesamiento_sin_categoricas():
     df = pd.DataFrame({"service": ["dns", "-"], "state": ["INT", "FIN"], "proto": ["tcp", "udp"],
                        "dur": [1.0, 2.0], "sbytes": [10, 20]})
     assert construir_preprocesamiento(["dur", "sbytes"], incluir_categoricas=False).fit_transform(df).shape == (2, 2)
+
+
+def test_pliegues_por_bloques_conservan_orden_y_cubren_todo():
+    import numpy as np
+    from src.datos import pliegues_por_bloques
+
+    pliegues = pliegues_por_bloques(5000, n_pliegues=5, tamano_bloque=500)
+    todas_val = np.concatenate([v for _, v in pliegues])
+    assert sorted(todas_val) == list(range(5000))  # cada fila valida exactamente una vez
+    for tr, val in pliegues:
+        assert set(tr).isdisjoint(val)
+        assert (np.diff(val)[np.diff(val) > 1] > 1).all()  # bloques completos y en orden
+        assert np.array_equal(val, np.sort(val))

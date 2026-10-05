@@ -52,3 +52,27 @@ Pedida por el equipo como primera mirada al conjunto de prueba (82.327 filas: 36
 - Cambio: tipo de modelo (regresión logística → XGBoost) y régimen de evaluación (5 pliegues por bloques, ver `docs/decisiones.md`). La regresión logística se vuelve a entrenar con los mismos pliegues para que la comparación sea justa. Ambos usan las variables categóricas codificadas.
 - Criterio: mayor precisión con recall ≥ 0,90 (en cada pliegue y promedio); además se vigilan el macro-F1, la tasa de falsos positivos y el ROC-AUC. El umbral aún no se elige.
 - Configuración de XGBoost: valores moderados sin ajuste (300 árboles, profundidad máxima 6, tasa de aprendizaje 0,1, `hist`, sin ponderar clases), para cambiar una decisión a la vez.
+
+### Resultados del experimento 3 (validación cruzada por bloques, 5 pliegues, media ± desviación entre pliegues)
+
+| Métrica | Regresión logística | XGBoost |
+|---|---|---|
+| Precisión máxima con recall ≥ 0,90 | 0,969 ± 0,008 | **0,985 ± 0,008** |
+| Precisión (umbral 0,5) | 0,920 ± 0,014 | **0,946 ± 0,017** |
+| Recall (umbral 0,5) | **0,988 ± 0,002** | 0,977 ± 0,003 |
+| Tasa de falsos positivos (umbral 0,5) | 0,185 ± 0,031 | **0,119 ± 0,027** |
+| Macro-F1 (umbral 0,5) | 0,919 ± 0,010 | **0,936 ± 0,012** |
+| ROC-AUC | 0,982 ± 0,003 | **0,990 ± 0,003** |
+| Falsas alarmas por pliegue (umbral 0,5) | 2.033 | **1.319** |
+| Ataques no detectados por pliegue (umbral 0,5) | **295** | 559 |
+
+Conclusiones:
+- La hipótesis se cumple: XGBoost supera a la regresión logística en el criterio principal (precisión con recall ≥ 0,90) en los 5 pliegues, con una mejora media de 0,016 (de 0,969 a 0,985); es decir, la proporción de alertas incorrectas baja de 3,1 % a 1,5 %. También gana en precisión, falsas alarmas, macro-F1 y ROC-AUC en todos los pliegues.
+- Con el umbral 0,5 XGBoost reduce las falsas alarmas un 35 % (2.033 → 1.319), a costa de más ataques no detectados (295 → 559) y un recall algo menor (0,977 frente a 0,988). Ambos quedan por encima del piso de 0,90, y el umbral aún no se ha elegido.
+- La diferencia entre modelos (0,016) es del mismo tamaño que la variación entre pliegues (0,008 de desviación), pero el signo es el mismo en los 5 pliegues.
+
+Precauciones:
+- "Precisión máxima con recall ≥ 0,90" usa el mejor umbral de cada pliegue conociendo sus etiquetas, así que es un techo optimista del criterio; el umbral real deberá fijarse sin ver el pliegue evaluado (por ejemplo con las predicciones fuera de muestra de los otros pliegues).
+- Persisten los duplicados y las filas vecinas parecidas, y la validación no refleja el cambio de sesión de captura que sí tiene la prueba; el resultado en prueba de la regresión logística (macro-F1 0,795 frente a 0,927 en validación) recuerda que estas cifras serán optimistas. XGBoost no se ha evaluado en prueba.
+- Solo se probó una configuración de XGBoost (sin ajuste de hiperparámetros ni ponderación de clases).
+- Trazabilidad: MLflow, experimento `unsw-nb15`, ejecuciones `cv-regresion-logistica` y `cv-xgboost` (modelos registrados con esos nombres, versión 1); código en `src/validacion_cruzada.py` (`.venv/bin/python -m src.validacion_cruzada`); modelos reajustados con todo el entrenamiento en `models/cv-*.joblib` y predicciones fuera de muestra en `data/processed/oof_cv-*.csv`, versionados con DVC. Las etiquetas `git_commit` de estas ejecuciones marcan `git_cambios_sin_commit=True` porque el código se consolidó en Git después de entrenar. Hay además una ejecución fallida de `cv-xgboost` (error al serializar el modelo con el formato por defecto de MLflow; se corrigió usando `cloudpickle`).

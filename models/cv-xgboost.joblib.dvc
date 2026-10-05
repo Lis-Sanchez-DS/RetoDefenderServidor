@@ -1,0 +1,5 @@
+outs:
+- md5: 0ce289f527686ab509a7d289c3c79c60
+  size: 848510
+  hash: md5
+  path: cv-xgboost.joblib
