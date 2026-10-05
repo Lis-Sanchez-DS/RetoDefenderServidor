@@ -133,3 +133,16 @@ Conclusiones:
 - La mejora es pequeña frente al ruido: +0,003 de precisión con una desviación entre pliegues de 0,002. Las 8 mejores pruebas están entre 0,9793 y 0,9797 (la mediana de las completas es 0,9785): el paisaje es plano y elegir "la mejor" de 46 pruebas sobre los mismos pliegues sobrestima algo la mejora real.
 - Las mejores pruebas caen en el borde del espacio: 9 de las 10 mejores tienen `max_depth` 9 o 10 (el máximo permitido) y `min_child_weight` bajo (1 a 4). Es posible que modelos más profundos mejoren algo más; no se probó.
 - Trazabilidad: ejecución padre `optuna-xgboost-busqueda` y 50 ejecuciones anidadas `optuna-prueba-N` en MLflow; el estudio completo queda en `optuna.db` (local, no versionado); modelo reajustado con la mejor configuración y registrado como `cv-grupos-xgboost-optuna` (modelo en `models/` y predicciones fuera de muestra en `data/processed/`, versionados con DVC). No se usó la prueba.
+
+## Experimento 6: elección del umbral de decisión (hipótesis escrita antes de ejecutar)
+
+Modelo: la mejor configuración de Optuna (`cv-grupos-xgboost-optuna`). Datos: solo las predicciones fuera de muestra de los 5 pliegues por grupos (`data/processed/oof_cv-grupos-xgboost-optuna.csv`). La prueba no se usa.
+
+**Hipótesis (del usuario):** como el objetivo es maximizar la precisión con un recall alto fijado (≥ 0,95), el umbral óptimo estará cerca de 0,5. Además, al elegir se favorecerán umbrales más bajos, porque se prefieren falsas alarmas a ataques sin revisar.
+
+Operacionalización (fijada por el asistente antes de ejecutar; ajustable):
+- Se barren umbrales de 0,05 a 0,95 en pasos de 0,01 y se calculan recall, precisión y falsas alarmas por pliegue y su media.
+- Un umbral es admisible si el recall medio es ≥ 0,95 y el recall de cada pliegue es ≥ 0,95.
+- "Cerca de 0,5" significa que el umbral elegido está entre 0,40 y 0,60.
+- Regla de elección con sesgo hacia umbrales bajos: entre los admisibles, se toma el umbral más bajo cuya precisión media esté a menos de 0,002 de la máxima (0,002 es la desviación entre pliegues observada en el experimento 5, es decir, diferencias dentro del ruido).
+- Precaución: el umbral se elige con las mismas predicciones fuera de muestra con que se eligió la configuración; el modelo final se reajusta con todo el entrenamiento y sus probabilidades pueden diferir algo de las de los modelos de pliegue (entrenados con el 80 %). La prueba mostrará si el umbral se sostiene.
