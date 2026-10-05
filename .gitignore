@@ -20,3 +20,6 @@ mlflow.db
 !/data/raw/.gitkeep
 !/data/processed/.gitkeep
 !/models/.gitkeep
+
+# Configuración local de Claude Code (no se publica)
+.claude/
