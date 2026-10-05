@@ -12,3 +12,15 @@ Lectura: el recall perfecto no es mérito del modelo, y el macro-F1 de 0,415 y l
 
 ## Partición de validación
 Se parte el entrenamiento oficial en bloques contiguos de 500 filas asignados al azar (80 % entrenamiento, 20 % validación, semilla 42). El conjunto de prueba no se usa para elegir nada.
+
+## Codificación de `service` y `state`
+Se aplica one-hot a `service` y `state` (ver `src/preprocesamiento.py`); el transformador se ajusta solo con entrenamiento y se guarda dentro del pipeline del modelo.
+
+Se eliminan las filas cuyo `state` es `ACC` o `CLO` (5 filas en prueba, ninguna en entrenamiento) o `no` (1 fila en entrenamiento, ninguna en prueba). Son valores que aparecen en una sola partición: el modelo no los vio al entrenar, o no se pueden evaluar. Son 6 de 257.673 filas (0,002 %), por lo que su efecto en la población estudiada es insignificante y solo complicarían la codificación. Tras eliminarlas: 175.340 filas de entrenamiento y 82.327 de prueba.
+
+## `proto`: pendiente
+Se excluye de las entradas hasta decidir su tratamiento. Hallazgos en entrenamiento:
+- Los protocolos distintos de tcp/udp (32.111 filas, 91 % ataques) casi siempre tienen `state` INT y `service` "-". Esa celda (INT + "-") es mixta por sí sola (86,7 % ataques), así que `state` y `service` no explican el patrón: dentro de ella, `unas`, `ospf` y los demás protocolos raros son ~100 % ataque, `arp` 0 % y `udp` 76 %.
+- Una regla basada solo en `state` y `service` acierta el 3 % de las filas de `arp`; es decir, `proto` aporta información adicional. El acierto de una tabla de búsqueda en muestra sube de 0,794 (state+service) a 0,818 (con proto).
+- El patrón se repite en la partición de prueba (arp 0 %, unas 100 %, ospf 99,8 %), pero en prueba la celda INT + "-" baja a 45 % de ataques para udp.
+- Riesgo: es probable que refleje cómo se generó el ataque en el laboratorio (herramientas que usan protocolos inusuales) y no un comportamiento transferible a una red real. Se tratará como experimento: con y sin `proto`.

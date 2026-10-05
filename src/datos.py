@@ -9,13 +9,17 @@ import numpy as np
 import pandas as pd
 
 RUTA = "data/raw/unsw-nb15/particion_oficial/UNSW_NB15_{}-set.csv"
+# Estados que aparecen en una sola partición (5 filas en prueba, 1 en entrenamiento):
+# no aportan y complicarían la codificación. Ver docs/decisiones.md.
+ESTADOS_EXCLUIDOS = ["no", "ACC", "CLO"]
 # `id` solo refleja el orden del archivo; `label` y `attack_cat` son la respuesta.
 COLUMNAS_EXCLUIDAS = ["id", "label", "attack_cat"]
 
 
 def cargar(particion: str) -> pd.DataFrame:
-    """Lee 'training' o 'testing' de la partición oficial."""
-    return pd.read_csv(RUTA.format(particion))
+    """Lee 'training' o 'testing' de la partición oficial, sin los estados excluidos."""
+    df = pd.read_csv(RUTA.format(particion))
+    return df[~df["state"].isin(ESTADOS_EXCLUIDOS)].reset_index(drop=True)
 
 
 def separar_xy(df: pd.DataFrame):
