@@ -1,0 +1,5 @@
+outs:
+- md5: 2fac43dbf308ae68f1513905763d1335
+  size: 10081
+  hash: md5
+  path: regresion-logistica-con-categoricas.joblib

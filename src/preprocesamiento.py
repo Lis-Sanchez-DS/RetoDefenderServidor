@@ -9,7 +9,7 @@
 `incluir_categoricas=False` descarta las tres columnas categóricas.
 El transformador se guarda dentro del pipeline del modelo.
 """
-from sklearn.compose import ColumnTransformer, make_column_selector
+from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 CATEGORICAS = ["service", "state"]
@@ -17,8 +17,12 @@ FRECUENCIA_MINIMA_PROTO = 0.01
 TODAS_CATEGORICAS = CATEGORICAS + ["proto"]
 
 
-def construir_preprocesamiento(incluir_categoricas: bool = True, escalar: bool = True) -> ColumnTransformer:
-    numericas = make_column_selector(dtype_include="number")
+def columnas_numericas(X):
+    """Columnas numéricas de entrada (todo lo que no es categórico)."""
+    return [c for c in X.columns if c not in TODAS_CATEGORICAS]
+
+
+def construir_preprocesamiento(numericas, incluir_categoricas: bool = True, escalar: bool = True) -> ColumnTransformer:
     pasos = [("numericas", StandardScaler() if escalar else "passthrough", numericas)]
     if incluir_categoricas:
         pasos += [

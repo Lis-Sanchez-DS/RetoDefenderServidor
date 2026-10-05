@@ -1,0 +1,5 @@
+outs:
+- md5: e1c2f3d03d42a153064f6b04d88f423e
+  size: 4865
+  hash: md5
+  path: regresion-logistica-sin-categoricas.joblib
