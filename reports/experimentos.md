@@ -33,3 +33,16 @@ Todos los experimentos usan la misma partición de entrenamiento/validación (bl
 - Modelos completos (preprocesamiento + clasificador) en `models/*.joblib`, versionados con DVC (`models/*.joblib.dvc`).
 - Reproducir: `.venv/bin/python -m src.experimentos`.
 - En MLflow quedan además dos ejecuciones de la línea base (la primera con 175.341 filas, antes de excluir 1 fila con estado `no`; la vigente es la segunda) y una ejecución fallida de la regresión sin categóricas, causada por un error al guardar el modelo (selector de columnas no serializable), ya corregido.
+
+## Evaluación en prueba: regresión logística con categóricas
+Pedida por el equipo como primera mirada al conjunto de prueba (82.327 filas: 36.998 normales y 45.329 ataques). Modelo `regresion-logistica-con-categoricas` v1, tal como se guardó (verificado contra su hash de DVC), umbral 0,5 sin ajustar. Se ejecutó una vez con `.venv/bin/python -m src.evaluar_test regresion-logistica-con-categoricas`, queda en MLflow (`etapa=evaluacion_test`) y se conserva tal cual.
+
+| | Recall | Precisión | Tasa de falsos positivos | Macro-F1 | ROC-AUC | PR-AUC | Falsos negativos | Falsos positivos |
+|---|---|---|---|---|---|---|---|---|
+| Validación | 0,988 | 0,935 | 0,169 | 0,927 | 0,986 | 0,994 | 307 | 1.719 |
+| Prueba | 0,972 | 0,753 | 0,392 | 0,795 | 0,955 | 0,966 | 1.270 | 14.483 |
+
+- El modelo se degrada en prueba: el macro-F1 baja de 0,927 a 0,795 y la tasa de falsos positivos sube de 0,17 a 0,39 (39 % del tráfico normal se marca como ataque). El recall se mantiene alto (0,972).
+- El deterioro coincide con lo esperado por la partición: la prueba incluye datos de otra sesión de captura (22 de enero) que el entrenamiento no tiene, tiene menos ataques proporcionalmente (55 % frente a 68 %) y la validación salía de la misma distribución que el entrenamiento. No se ha comprobado qué parte del deterioro se debe a cada causa.
+- Recall por familia de ataque (umbral 0,5): Generic 0,999, Reconnaissance 0,996, Shellcode 0,989, Backdoor 0,988, Worms 0,977, DoS 0,975, Exploits 0,940, Fuzzers 0,935, Analysis 0,914.
+- Esta evaluación ya se usó: no deben tomarse decisiones de modelo ni de umbral ajustando sobre este resultado. Solo se evaluó este modelo; el de solo numéricas no se evaluó en prueba.
