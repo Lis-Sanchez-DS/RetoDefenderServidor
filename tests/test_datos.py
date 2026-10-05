@@ -22,10 +22,18 @@ def test_preprocesamiento_agrupa_proto_infrecuente():
 
     protos = ["tcp"] * 120 + ["udp"] * 78 + ["raro1", "raro2"]  # cada raro: 0,5 %
     df = pd.DataFrame({"service": ["-"] * 200, "state": ["INT"] * 200, "proto": protos, "dur": 1.0})
-    pp = construir_preprocesamiento().fit(df)
+    pp = construir_preprocesamiento(escalar=False).fit(df)
     nombres = list(pp.get_feature_names_out())
     assert "proto_infrequent_sklearn" in nombres
     assert "proto_raro1" not in nombres
     nuevo = pd.DataFrame({"service": ["-"], "state": ["INT"], "proto": ["otro_nuevo"], "dur": [1.0]})
     fila = dict(zip(nombres, pp.transform(nuevo)[0]))
     assert fila["proto_infrequent_sklearn"] == 1.0
+
+
+def test_preprocesamiento_sin_categoricas():
+    from src.preprocesamiento import construir_preprocesamiento
+
+    df = pd.DataFrame({"service": ["dns", "-"], "state": ["INT", "FIN"], "proto": ["tcp", "udp"],
+                       "dur": [1.0, 2.0], "sbytes": [10, 20]})
+    assert construir_preprocesamiento(incluir_categoricas=False).fit_transform(df).shape == (2, 2)
