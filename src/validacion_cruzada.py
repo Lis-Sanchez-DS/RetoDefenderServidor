@@ -78,7 +78,7 @@ def _git(*args):
     return subprocess.run(["git", *args], capture_output=True, text=True).stdout.strip()
 
 
-def ejecutar(nombre, cfg, X, y, pliegues, params, regimen="bloques"):
+def ejecutar(nombre, cfg, X, y, pliegues, params, regimen="bloques", etiquetas=None):
     seed = params["seed"]
     oof = pd.DataFrame({"y": y.values, "prob": np.nan, "pliegue": -1})
     filas = []
@@ -91,6 +91,7 @@ def ejecutar(nombre, cfg, X, y, pliegues, params, regimen="bloques"):
             "datos_dvc_md5_entrenamiento": md5,
             "criterio": f"max precision con recall >= {PISO_RECALL}",
             "regimen_pliegues": regimen,
+            **(etiquetas or {}),
         })
         mlflow.log_params({**cfg["parametros"], "n_pliegues": len(pliegues), "tamano_bloque": 500,
                            "seed": seed, "umbral": 0.5, "piso_recall": PISO_RECALL,
@@ -117,6 +118,7 @@ def ejecutar(nombre, cfg, X, y, pliegues, params, regimen="bloques"):
             resumen[f"{m}_media"], resumen[f"{m}_std"] = float(d[m].mean()), float(d[m].std())
         resumen["fp_media"], resumen["fn_media"] = float(d.fp.mean()), float(d.fn.mean())
         mlflow.log_metrics(resumen)
+        resumen["run_id"] = mlflow.active_run().info.run_id  # lo usa el pipeline para registrar
         # Modelo final: reajustado con todo el entrenamiento (para versionarlo)
         final = construir(cfg, X, seed).fit(X, y)
         mlflow.sklearn.log_model(final, name="modelo", registered_model_name=nombre,

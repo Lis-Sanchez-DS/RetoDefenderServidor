@@ -1,0 +1,5 @@
+outs:
+- md5: 701f358a9c051c07a2112ff0acd412fe
+  size: 10081
+  hash: md5
+  path: pipeline-regresion-logistica.joblib

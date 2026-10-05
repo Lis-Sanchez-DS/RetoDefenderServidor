@@ -1,0 +1,5 @@
+outs:
+- md5: 554b165ebbfa9eeccd94b1a4f3477342
+  size: 9127451
+  hash: md5
+  path: pipeline-xgboost-optuna.joblib

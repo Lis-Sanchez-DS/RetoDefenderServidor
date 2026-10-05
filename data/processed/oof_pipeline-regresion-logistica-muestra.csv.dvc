@@ -1,0 +1,5 @@
+outs:
+- md5: 9eb84837598f3d9ee8f0d53d3a79f59b
+  size: 249748
+  hash: md5
+  path: oof_pipeline-regresion-logistica-muestra.csv

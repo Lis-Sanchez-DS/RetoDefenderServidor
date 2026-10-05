@@ -1,0 +1,5 @@
+outs:
+- md5: c13117d44295d1973843c28386330f96
+  size: 664901
+  hash: md5
+  path: pipeline-xgboost-muestra.joblib

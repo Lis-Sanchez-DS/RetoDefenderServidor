@@ -6,3 +6,10 @@ data:
 split:
   test_size: 0.2
   val_size: 0.2
+pipeline:
+  piso_recall: 0.95        # recall mínimo exigido en cada pliegue (ver docs/decisiones.md)
+  umbral: 0.6              # umbral congelado (experimento 6)
+  n_pliegues: 5
+  prefijo_modelos: pipeline  # nombres propios: no pisan los modelos congelados de los experimentos
+  modelo_registrado: defender-servidor
+  parametros_optuna: reports/optuna_mejores_parametros.json
