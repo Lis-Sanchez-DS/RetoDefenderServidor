@@ -25,7 +25,16 @@
 5. Sarhan, M. et al. "NetFlow Datasets for Machine Learning-Based Network Intrusion Detection Systems." BDTA 2020, Springer.
 
 ## Versión utilizada
-Pendiente: se completará con los nombres de archivo, tamaños y sumas SHA-256 reales una vez descargados manualmente en `data/raw/`.
+Archivos descargados manualmente de la carpeta oficial de UNSW el 5 de octubre de 2026 (página actualizada por última vez el 2 de junio de 2021). Se guardan en `data/raw/` y los versiona DVC (archivos `.dvc`).
+
+| Archivo | Filas de datos | Tamaño (bytes) | SHA-256 |
+|---|---|---|---|
+| `UNSW_NB15_training-set.csv` | 175.341 | 32.293.018 | `bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa` |
+| `UNSW_NB15_testing-set.csv` | 82.332 | 15.380.800 | `734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559` |
+| `NUSW-NB15_features.csv` | 49 (descripción de variables) | 4.044 | `c55f19cceebb6360dc50f44f8a5f246ccefbcf8a6c604ac1ad46e643869cafce` |
+| `NUSW-NB15_GT.csv` | 188.913 | 86.426.111 | `6d27542cb6457db599e0a78274ac141fec0296531f00ac5569551a276c5ab1a8` |
+
+Las filas de entrenamiento y prueba coinciden con las cifras publicadas por los autores. Los cuatro CSV crudos (`UNSW-NB15_1..4.csv`) no se descargaron por ahora.
 
 ## Limitaciones conocidas (a verificar en la exploración)
 Benchmark histórico de laboratorio (2015): no demuestra eficacia sobre redes actuales.
