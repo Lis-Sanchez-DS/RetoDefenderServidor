@@ -21,6 +21,11 @@ Se eliminan las filas cuyo `state` es `ACC` o `CLO` (5 filas en prueba, ninguna 
 ## `proto`: agrupar los infrecuentes y aplicar one-hot
 Decisión: los valores de `proto` que aparecen en menos del 1 % de las filas de entrenamiento se agrupan en una categoría "infrecuente" y luego se aplica one-hot (`min_frequency=0.01` en `src/preprocesamiento.py`). La frecuencia se calcula al ajustar el transformador, solo con entrenamiento; los valores nuevos en prueba caen en la misma categoría.
 Resultado: 6 columnas (`tcp`, `udp`, `unas`, `arp`, `ospf` e infrecuente; esta última reúne 128 protocolos y 14.573 filas). Con esto la entrada tiene 66 columnas.
+Justificación del umbral de 1 %:
+- Aparecer en menos del 1 % de las filas tiene una fuerte correlación con ser ataque: la categoría infrecuente reúne 14.573 filas de entrenamiento y es casi todo ataque (126 de los 133 protocolos son 100 % ataque).
+- Deja un buen equilibrio: se conserva la variación de `proto` que importa (`tcp` y `udp`, que son mixtos, más `arp`, `unas` y `ospf`, cada uno con un comportamiento distinto) y se absorbe en una sola categoría la mayoría de las clases pequeñas (128 de 133 valores), evitando decenas de columnas casi vacías.
+- Advertencia: justamente por esa correlación, la categoría infrecuente puede ser un atajo del laboratorio y no un comportamiento transferible a una red real; por eso se evaluará con y sin `proto`.
+
 Hallazgos que motivaron el análisis:
 - Los protocolos distintos de tcp/udp (32.111 filas, 91 % ataques) casi siempre tienen `state` INT y `service` "-". Esa celda (INT + "-") es mixta por sí sola (86,7 % ataques), así que `state` y `service` no explican el patrón: dentro de ella, `unas`, `ospf` y los demás protocolos raros son ~100 % ataque, `arp` 0 % y `udp` 76 %.
 - Una regla basada solo en `state` y `service` acierta el 3 % de las filas de `arp`; es decir, `proto` aporta información adicional. El acierto de una tabla de búsqueda en muestra sube de 0,794 (state+service) a 0,818 (con proto).
