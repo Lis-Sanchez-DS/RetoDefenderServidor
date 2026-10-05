@@ -1,33 +1,33 @@
 # Defiende el servidor — UNSW-NB15
 
-MLOps project: detect attack vs. normal traffic on UNSW-NB15, with reproducible
-data, experiments, models and pipeline (Git + DVC + MLflow + Prefect).
+Proyecto de MLOps: distinguir tráfico normal de ataques en UNSW-NB15, con datos,
+experimentos, modelos y pipeline reproducibles (Git + DVC + MLflow + Prefect).
 
-## Status
-Scaffolding only. No data downloaded and no models trained yet.
+## Estado
+Solo la estructura base. Aún no se han descargado datos ni entrenado modelos.
 
-## Setup
+## Instalación
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt   # exact versions: requirements.lock.txt
+.venv/bin/pip install -r requirements.txt   # versiones exactas: requirements.lock.txt
 ```
 
-## Layout
-- `src/pipeline/` — Prefect flow (prepare → train → compare → register)
-- `data/raw`, `data/processed`, `models/` — tracked with DVC (not Git)
-- `params.yaml` — central configuration
-- `reports/` — experiment table and final decision
-- `notebooks/` — exploration
-- `tests/` — tests
+## Estructura
+- `src/pipeline/` — flujo de Prefect (preparar → entrenar → comparar → registrar)
+- `data/raw`, `data/processed`, `models/` — versionados con DVC (no con Git)
+- `params.yaml` — configuración central
+- `reports/` — tabla de experimentos y decisión final
+- `notebooks/` — exploración
+- `tests/` — pruebas
 
-## Tool responsibilities
-| Tool | Role |
+## Responsabilidad de cada herramienta
+| Herramienta | Función |
 |---|---|
-| Git | code and decisions |
-| DVC | data and model versions |
-| MLflow | experiments and model registry |
-| Prefect | pipeline orchestration |
+| Git | código y decisiones |
+| DVC | versiones de datos y modelos |
+| MLflow | experimentos y registro de modelos |
+| Prefect | orquestación del pipeline |
 
-## Data
-UNSW-NB15 (UNSW Canberra). Source, version and usage conditions: to be documented
-when downloaded.
+## Datos
+UNSW-NB15 (UNSW Canberra). La fuente, la versión y las condiciones de uso se
+documentarán cuando se descarguen.

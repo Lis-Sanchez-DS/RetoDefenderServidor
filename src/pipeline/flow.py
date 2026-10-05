@@ -1,28 +1,28 @@
-"""Prefect flow connecting prepare -> train -> compare -> register.
+"""Flujo de Prefect que conecta preparar -> entrenar -> comparar -> registrar.
 
-Stages are placeholders until data and models are decided.
+Las etapas son marcadores de posición hasta definir los datos y los modelos.
 """
 from prefect import flow, task, get_run_logger
 
 
 @task
 def prepare_data():
-    get_run_logger().info("prepare_data: not implemented")
+    get_run_logger().info("prepare_data: sin implementar")
 
 
 @task
 def train_models():
-    get_run_logger().info("train_models: not implemented")
+    get_run_logger().info("train_models: sin implementar")
 
 
 @task
 def compare_experiments():
-    get_run_logger().info("compare_experiments: not implemented")
+    get_run_logger().info("compare_experiments: sin implementar")
 
 
 @task
 def register_model():
-    get_run_logger().info("register_model: not implemented")
+    get_run_logger().info("register_model: sin implementar")
 
 
 @flow(name="defender-servidor")

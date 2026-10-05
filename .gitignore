@@ -1,19 +1,19 @@
-# Course material (not redistributed)
+# Material del curso (no se redistribuye)
 guia-conceptual-defiende-servidor-2026II.pdf
 
-# Environment
+# Entorno
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 
-# Experiment tracking / orchestration local state
+# Estado local de seguimiento de experimentos y orquestación
 mlruns/
 mlartifacts/
 mlflow.db
 .prefect/
 
-# Data and models are tracked by DVC, not Git
+# Datos y modelos los versiona DVC, no Git
 /data/raw/*
 /data/processed/*
 /models/*
