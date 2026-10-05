@@ -110,3 +110,26 @@ Conclusiones:
 - Referencia previa a la búsqueda (XGBoost por defecto del experimento 4, calculada con sus predicciones fuera de muestra con recall ≥ 0,95 en cada pliegue): precisión 0,977 ± 0,002; falsas alarmas 534 por pliegue (± 37), tasa de falsos positivos 0,048 ± 0,003.
 - Interpretación de "reducción significativa" (fijada por el asistente antes de ejecutar; ajustable): al menos un 20 % menos de falsas alarmas que la referencia (≤ 427 por pliegue en media) con el recall ≥ 0,95, y que la reducción se dé en los 5 pliegues. Si la mejor configuración queda por debajo de eso, la hipótesis no se cumple.
 - Precaución: la precisión con recall ≥ 0,95 usa el mejor umbral de cada pliegue conociendo sus etiquetas (techo optimista); sirve para comparar configuraciones. Probar muchas configuraciones sobre los mismos pliegues puede ajustar el resultado a esa validación: la prueba mostrará si la mejora es real, y el modelo se congelará antes.
+
+### Resultados del experimento 5 (50 pruebas: 46 completas y 4 podadas; 42 min en total, 54 s por prueba completa)
+
+Mejor configuración (prueba 45): `n_estimators` 706, `max_depth` 10, `learning_rate` 0,0347, `min_child_weight` 1, `subsample` 0,81, `colsample_bytree` 0,62, `reg_alpha` 5,8e-6, `reg_lambda` 0,0018 (en `reports/optuna_mejores_parametros.json`).
+
+Con recall ≥ 0,95 en cada pliegue, frente a la referencia (XGBoost por defecto):
+
+| Pliegue | Falsas alarmas, referencia | Falsas alarmas, mejor Optuna | Reducción |
+|---|---|---|---|
+| 0 | 482 | 406 | 15,8 % |
+| 1 | 531 | 496 | 6,6 % |
+| 2 | 576 | 553 | 4,0 % |
+| 3 | 561 | 484 | 13,7 % |
+| 4 | 518 | 410 | 20,8 % |
+| Media | 534 | 470 | **12,0 %** |
+
+Precisión media con recall ≥ 0,95: 0,980 frente a 0,977. Al umbral 0,5: recall 0,977, precisión 0,962, tasa de falsos positivos 0,082, macro-F1 0,951 (referencia: 0,976; 0,960; 0,086; 0,949).
+
+Conclusiones:
+- Hipótesis: se cumple a medias. El recall ≥ 0,95 se mantiene (es el piso del objetivo) y las falsas alarmas bajan, pero un 12 % de media, por debajo del 20 % fijado como "reducción significativa", y solo en 1 de los 5 pliegues se llega al 20 %. Con el criterio acordado, la hipótesis no se cumple.
+- La mejora es pequeña frente al ruido: +0,003 de precisión con una desviación entre pliegues de 0,002. Las 8 mejores pruebas están entre 0,9793 y 0,9797 (la mediana de las completas es 0,9785): el paisaje es plano y elegir "la mejor" de 46 pruebas sobre los mismos pliegues sobrestima algo la mejora real.
+- Las mejores pruebas caen en el borde del espacio: 9 de las 10 mejores tienen `max_depth` 9 o 10 (el máximo permitido) y `min_child_weight` bajo (1 a 4). Es posible que modelos más profundos mejoren algo más; no se probó.
+- Trazabilidad: ejecución padre `optuna-xgboost-busqueda` y 50 ejecuciones anidadas `optuna-prueba-N` en MLflow; el estudio completo queda en `optuna.db` (local, no versionado); modelo reajustado con la mejor configuración y registrado como `cv-grupos-xgboost-optuna` (modelo en `models/` y predicciones fuera de muestra en `data/processed/`, versionados con DVC). No se usó la prueba.

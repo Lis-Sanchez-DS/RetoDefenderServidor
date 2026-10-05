@@ -1,0 +1,15 @@
+{
+  "mejor_precision_recall095": 0.9797116389748435,
+  "mejores_parametros": {
+    "n_estimators": 706,
+    "max_depth": 10,
+    "learning_rate": 0.034711400118217696,
+    "min_child_weight": 1,
+    "subsample": 0.8090669940799663,
+    "colsample_bytree": 0.6177945955567832,
+    "reg_alpha": 5.8014439943974086e-06,
+    "reg_lambda": 0.001751885468401486
+  },
+  "pruebas_completas": 46,
+  "pruebas_podadas": 4
+}
