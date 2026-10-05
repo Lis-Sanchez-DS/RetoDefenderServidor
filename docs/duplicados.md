@@ -25,3 +25,10 @@ Limitaciones:
 - Se renuncia a la separación por bloques: filas vecinas parecidas (no idénticas) pueden quedar a ambos lados.
 - Las copias siguen pesando en el entrenamiento (un sondeo repetido 400 veces cuenta 400 veces).
 - La prueba mantiene sus copias y su solapamiento con el entrenamiento: sus números seguirán siendo algo optimistas en el recall.
+
+## Lectura revisada: ¿es una fuga o son datos reales?
+Se mantienen los pliegues por grupos tal como están; no se hará nada más para separar las filas parecidas. Razón: las filas casi idénticas (no exactas) de una misma ráfaga de tráfico son mediciones distintas y reales, no un artefacto. Que haya filas parecidas a ambos lados de un pliegue es una fuga solo si lo que se quiere estimar es el rendimiento ante eventos nuevos; si se quiere estimar el rendimiento ante más tráfico del mismo tipo, es legítimo.
+- Copias exactas: son la misma medición contada dos veces; separarlas (decisión anterior) sigue siendo correcto.
+- Filas parecidas: los pliegues por grupos estiman el rendimiento ante más tráfico de la misma captura (en distribución). No estiman el rendimiento ante ráfagas de ataque nuevas ni otro día de captura; para esa pregunta las cifras de validación son un techo optimista.
+- La única señal sobre condiciones nuevas es el conjunto de prueba, que incluye la sesión del 22 de enero que el entrenamiento no tiene: la regresión logística bajó de 0,927 a 0,795 de macro-F1. Esa caída mezcla varias causas (la sesión nueva, otra proporción de clases y las ráfagas), y no se ha medido cuánto aporta cada una.
+- Por tanto, en los informes no se hablará de "fuga" para las filas parecidas: se dirá que la validación estima el rendimiento en distribución y que la prueba es la referencia para condiciones nuevas.
