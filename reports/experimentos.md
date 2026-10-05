@@ -167,3 +167,14 @@ Operacionalización (fijada por el asistente antes de ejecutar; ajustable):
 ### Decisión del umbral (usuario)
 
 Se elige el **umbral 0,6** para el modelo `cv-grupos-xgboost-optuna`. Razón: pasar de 0,6 a 0,68 solo gana 0,006 de precisión (0,971 a 0,977) y deja un margen mínimo sobre el piso de recall; con 0,6 el recall fuera de muestra es 0,966 (mínimo por pliegue 0,964) y hay unas 696 falsas alarmas por pliegue. La decisión se tomó con predicciones fuera de muestra, sin usar la prueba.
+
+## Evaluación final en la prueba (expectativa escrita antes de ejecutar)
+
+Modelo congelado: `cv-grupos-xgboost-optuna`, umbral 0,6. Se evalúa una sola vez en `UNSW_NB15_testing-set.csv` (con los mismos estados excluidos que en el entrenamiento) y se compara con la media de validación (los 5 pliegues por grupos, al mismo umbral 0,6).
+
+Expectativa (del asistente, anotada antes de ver el resultado):
+- La prueba incluye la captura de enero, que el entrenamiento no tiene, y la regresión logística ya mostró un deterioro fuerte allí (tasa de falsos positivos 0,39 frente a ~0,1 en validación). Se espera que XGBoost se deteriore menos pero de forma clara.
+- Recall en la prueba por debajo del de validación (0,966), probablemente entre 0,90 y 0,97, y el piso de 0,95 podría no cumplirse.
+- Tasa de falsos positivos claramente mayor que en validación (0,067), probablemente entre 0,10 y 0,25, y por tanto precisión más baja (~0,85 a 0,93; además la prevalencia de ataques es distinta: 55 % en la prueba frente a ~68 % en el entrenamiento).
+- El número de falsos positivos no es comparable en bruto: la prueba tiene 82 332 filas y cada pliegue ~35 000. Se comparan tasas y se muestra el conteo por cada 10 000 filas.
+- Esta evaluación no se usa para cambiar el modelo ni el umbral.
