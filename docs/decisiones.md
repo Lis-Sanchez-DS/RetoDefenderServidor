@@ -18,8 +18,10 @@ Se aplica one-hot a `service` y `state` (ver `src/preprocesamiento.py`); el tran
 
 Se eliminan las filas cuyo `state` es `ACC` o `CLO` (5 filas en prueba, ninguna en entrenamiento) o `no` (1 fila en entrenamiento, ninguna en prueba). Son valores que aparecen en una sola partición: el modelo no los vio al entrenar, o no se pueden evaluar. Son 6 de 257.673 filas (0,002 %), por lo que su efecto en la población estudiada es insignificante y solo complicarían la codificación. Tras eliminarlas: 175.340 filas de entrenamiento y 82.327 de prueba.
 
-## `proto`: pendiente
-Se excluye de las entradas hasta decidir su tratamiento. Hallazgos en entrenamiento:
+## `proto`: agrupar los infrecuentes y aplicar one-hot
+Decisión: los valores de `proto` que aparecen en menos del 1 % de las filas de entrenamiento se agrupan en una categoría "infrecuente" y luego se aplica one-hot (`min_frequency=0.01` en `src/preprocesamiento.py`). La frecuencia se calcula al ajustar el transformador, solo con entrenamiento; los valores nuevos en prueba caen en la misma categoría.
+Resultado: 6 columnas (`tcp`, `udp`, `unas`, `arp`, `ospf` e infrecuente; esta última reúne 128 protocolos y 14.573 filas). Con esto la entrada tiene 66 columnas.
+Hallazgos que motivaron el análisis:
 - Los protocolos distintos de tcp/udp (32.111 filas, 91 % ataques) casi siempre tienen `state` INT y `service` "-". Esa celda (INT + "-") es mixta por sí sola (86,7 % ataques), así que `state` y `service` no explican el patrón: dentro de ella, `unas`, `ospf` y los demás protocolos raros son ~100 % ataque, `arp` 0 % y `udp` 76 %.
 - Una regla basada solo en `state` y `service` acierta el 3 % de las filas de `arp`; es decir, `proto` aporta información adicional. El acierto de una tabla de búsqueda en muestra sube de 0,794 (state+service) a 0,818 (con proto).
 - El patrón se repite en la partición de prueba (arp 0 %, unas 100 %, ospf 99,8 %), pero en prueba la celda INT + "-" baja a 45 % de ataques para udp.

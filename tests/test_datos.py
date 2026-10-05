@@ -17,10 +17,15 @@ def test_separar_xy_quita_id_y_respuesta():
     assert list(y) == [0]
 
 
-def test_preprocesamiento_onehot_y_sin_proto():
+def test_preprocesamiento_agrupa_proto_infrecuente():
     from src.preprocesamiento import construir_preprocesamiento
 
-    df = pd.DataFrame({"service": ["dns", "-", "http"], "state": ["INT", "FIN", "CON"],
-                       "proto": ["tcp", "udp", "tcp"], "dur": [1.0, 2.0, 3.0]})
-    Xt = construir_preprocesamiento().fit_transform(df)
-    assert Xt.shape == (3, 3 + 3 + 1)  # 3 servicios + 3 estados + dur
+    protos = ["tcp"] * 120 + ["udp"] * 78 + ["raro1", "raro2"]  # cada raro: 0,5 %
+    df = pd.DataFrame({"service": ["-"] * 200, "state": ["INT"] * 200, "proto": protos, "dur": 1.0})
+    pp = construir_preprocesamiento().fit(df)
+    nombres = list(pp.get_feature_names_out())
+    assert "proto_infrequent_sklearn" in nombres
+    assert "proto_raro1" not in nombres
+    nuevo = pd.DataFrame({"service": ["-"], "state": ["INT"], "proto": ["otro_nuevo"], "dur": [1.0]})
+    fila = dict(zip(nombres, pp.transform(nuevo)[0]))
+    assert fila["proto_infrequent_sklearn"] == 1.0
