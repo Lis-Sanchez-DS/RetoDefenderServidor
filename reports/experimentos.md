@@ -46,3 +46,9 @@ Pedida por el equipo como primera mirada al conjunto de prueba (82.327 filas: 36
 - El deterioro coincide con lo esperado por la partición: la prueba incluye datos de otra sesión de captura (22 de enero) que el entrenamiento no tiene, tiene menos ataques proporcionalmente (55 % frente a 68 %) y la validación salía de la misma distribución que el entrenamiento. No se ha comprobado qué parte del deterioro se debe a cada causa.
 - Recall por familia de ataque (umbral 0,5): Generic 0,999, Reconnaissance 0,996, Shellcode 0,989, Backdoor 0,988, Worms 0,977, DoS 0,975, Exploits 0,940, Fuzzers 0,935, Analysis 0,914.
 - Esta evaluación ya se usó: no deben tomarse decisiones de modelo ni de umbral ajustando sobre este resultado. Solo se evaluó este modelo; el de solo numéricas no se evaluó en prueba.
+
+## Experimento 3: XGBoost frente a regresión logística, con validación cruzada por bloques y enfoque en precisión
+- Hipótesis (definida por el equipo): al enfocarse en la precisión, XGBoost lo hará mejor que la regresión logística gracias a su mayor complejidad. La interpretabilidad no es prioritaria en este problema, así que se aceptan modelos más complejos siempre que funcionen.
+- Cambio: tipo de modelo (regresión logística → XGBoost) y régimen de evaluación (5 pliegues por bloques, ver `docs/decisiones.md`). La regresión logística se vuelve a entrenar con los mismos pliegues para que la comparación sea justa. Ambos usan las variables categóricas codificadas.
+- Criterio: mayor precisión con recall ≥ 0,90 (en cada pliegue y promedio); además se vigilan el macro-F1, la tasa de falsos positivos y el ROC-AUC. El umbral aún no se elige.
+- Configuración de XGBoost: valores moderados sin ajuste (300 árboles, profundidad máxima 6, tasa de aprendizaje 0,1, `hist`, sin ponderar clases), para cambiar una decisión a la vez.

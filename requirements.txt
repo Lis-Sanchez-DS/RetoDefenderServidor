@@ -7,3 +7,4 @@ mlflow
 prefect
 dvc
 pytest
+xgboost

@@ -31,3 +31,21 @@ Hallazgos que motivaron el análisis:
 - Una regla basada solo en `state` y `service` acierta el 3 % de las filas de `arp`; es decir, `proto` aporta información adicional. El acierto de una tabla de búsqueda en muestra sube de 0,794 (state+service) a 0,818 (con proto).
 - El patrón se repite en la partición de prueba (arp 0 %, unas 100 %, ospf 99,8 %), pero en prueba la celda INT + "-" baja a 45 % de ataques para udp.
 - Riesgo: es probable que refleje cómo se generó el ataque en el laboratorio (herramientas que usan protocolos inusuales) y no un comportamiento transferible a una red real. Se tratará como experimento: con y sin `proto`.
+
+## Enfoque en precisión con piso de recall
+Decisión: de aquí en adelante se busca mejorar la precisión (menos falsas alarmas) sin sacrificar la detección. Regla: **solo se mejora la precisión mientras el recall se mantenga por encima de 0,90**. El recall sigue siendo la prioridad principal por el criterio de costo (un ataque no detectado cuesta más que una falsa alarma); 0,90 es un piso provisional, que se puede subir.
+
+Origen de la decisión: ya en validación la regresión logística con categóricas mostraba un recall alto (0,988) pero todavía más de 1.000 falsas alarmas (1.719 de 10.166 normales, 17 %). Ese patrón, visible antes de mirar la prueba, es lo que motiva el enfoque. El resultado en prueba (precisión 0,75, 14.483 falsas alarmas) es coherente con él pero no se usa para ajustar nada.
+
+Cómo se mide: además de las métricas al umbral 0,5, se reporta la **precisión máxima con recall ≥ 0,90** de cada pliegue (sobre su curva precisión-recall). Así se compara la capacidad de cada modelo para el objetivo sin elegir todavía el umbral. El umbral se elegirá más adelante, con las predicciones fuera de muestra de la validación cruzada, nunca con la prueba.
+
+## Validación cruzada por bloques (sin mezclar filas)
+Se usa validación cruzada de 5 pliegues sobre el entrenamiento oficial, conservando el orden del archivo: las filas se agrupan en bloques contiguos de 500 y se asignan bloques completos a cada pliegue (los bloques se reparten al azar con semilla 42, las filas dentro de un bloque no se mezclan).
+
+Por qué no pliegues contiguos puros ni validación hacia adelante en el tiempo:
+- El archivo está ordenado en bloques por clase: por décimas de `id` la proporción de ataques es 0 %, 0 %, 27 %, 95 %, 86 %, 88 %, 85 %, 100 %, 100 %, 100 %. Un pliegue contiguo tendría una sola clase y la precisión o la tasa de falsos positivos no estarían definidas; el primer modelo de una validación hacia adelante se entrenaría solo con tráfico normal.
+- El orden del archivo no coincide exactamente con el tiempo de captura (correlación 0,96 en las filas que pude fechar), así que tampoco sería una validación temporal real.
+- Los bloques mantienen juntas las filas vecinas (que comparten ráfagas de tráfico y contadores `ct_*` parecidos), evitando que filas casi idénticas queden a ambos lados y inflen la validación. Es la misma lógica de la partición de entrenamiento/validación usada hasta ahora.
+Limitación: no se han eliminado los duplicados exactos, que pueden seguir cruzando pliegues; y los pliegues no reproducen el cambio de sesión de captura que sí aparece en prueba.
+
+Ambos modelos (regresión logística y XGBoost) se entrenan con los mismos pliegues y el mismo preprocesamiento para que la comparación sea justa.
