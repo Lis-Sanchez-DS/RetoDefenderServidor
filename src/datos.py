@@ -50,3 +50,15 @@ def pliegues_por_bloques(n_filas, n_pliegues=5, tamano_bloque=500, seed=42):
         en_val = np.isin(bloque, ids[val_b])
         pliegues.append((np.where(~en_val)[0], np.where(en_val)[0]))
     return pliegues
+
+
+def pliegues_por_grupos(X, y, n_pliegues=5, seed=42):
+    """Validación cruzada en la que las filas con el mismo vector de entrada van al mismo pliegue.
+
+    Estratificada por clase. Devuelve (índices_entrenamiento, índices_validación) por posición.
+    """
+    from sklearn.model_selection import StratifiedGroupKFold
+
+    grupos = X.groupby(list(X.columns), sort=False).ngroup().values
+    cv = StratifiedGroupKFold(n_splits=n_pliegues, shuffle=True, random_state=seed)
+    return [(tr, val) for tr, val in cv.split(X, y, grupos)]

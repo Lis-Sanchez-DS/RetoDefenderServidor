@@ -50,3 +50,17 @@ def test_pliegues_por_bloques_conservan_orden_y_cubren_todo():
         assert set(tr).isdisjoint(val)
         assert (np.diff(val)[np.diff(val) > 1] > 1).all()  # bloques completos y en orden
         assert np.array_equal(val, np.sort(val))
+
+
+def test_pliegues_por_grupos_no_separan_copias():
+    import numpy as np
+    from src.datos import pliegues_por_grupos
+
+    rng = np.random.default_rng(0)
+    X = pd.DataFrame({"a": rng.integers(0, 50, 2000), "b": rng.integers(0, 3, 2000)})
+    y = pd.Series(rng.integers(0, 2, 2000))
+    pliegues = pliegues_por_grupos(X, y, n_pliegues=5)
+    clave = X.astype(str).agg("-".join, axis=1)
+    for tr, val in pliegues:
+        assert set(clave.iloc[tr]).isdisjoint(set(clave.iloc[val]))
+    assert sorted(np.concatenate([v for _, v in pliegues])) == list(range(2000))

@@ -21,7 +21,7 @@ from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
 
 from src.baseline import metricas
-from src.datos import cargar, pliegues_por_bloques, separar_xy
+from src.datos import cargar, pliegues_por_bloques, pliegues_por_grupos, separar_xy
 from src.preprocesamiento import columnas_numericas, construir_preprocesamiento
 
 PISO_RECALL = 0.90
@@ -64,7 +64,7 @@ def _git(*args):
     return subprocess.run(["git", *args], capture_output=True, text=True).stdout.strip()
 
 
-def ejecutar(nombre, cfg, X, y, pliegues, params):
+def ejecutar(nombre, cfg, X, y, pliegues, params, regimen="bloques"):
     seed = params["seed"]
     oof = pd.DataFrame({"y": y.values, "prob": np.nan, "pliegue": -1})
     filas = []
@@ -76,6 +76,7 @@ def ejecutar(nombre, cfg, X, y, pliegues, params):
             "git_cambios_sin_commit": str(bool(_git("status", "--porcelain", "src", "params.yaml"))),
             "datos_dvc_md5_entrenamiento": md5,
             "criterio": f"max precision con recall >= {PISO_RECALL}",
+            "regimen_pliegues": regimen,
         })
         mlflow.log_params({**cfg["parametros"], "n_pliegues": len(pliegues), "tamano_bloque": 500,
                            "seed": seed, "umbral": 0.5, "piso_recall": PISO_RECALL,
@@ -116,9 +117,14 @@ def main():
     pliegues = pliegues_por_bloques(len(X), n_pliegues=5, tamano_bloque=500, seed=params["seed"])
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("unsw-nb15")
-    elegidos = sys.argv[1:] or list(MODELOS)  # opcionalmente, solo algunos modelos
-    for nombre, cfg in ((n, MODELOS[n]) for n in elegidos):
-        d, res = ejecutar(nombre, cfg, X, y, pliegues, params)
+    args = sys.argv[1:]
+    regimen = "grupos" if "--grupos" in args else "bloques"
+    elegidos = [a for a in args if not a.startswith("--")] or list(MODELOS)  # opcionalmente, solo algunos
+    if regimen == "grupos":
+        pliegues = pliegues_por_grupos(X, y, n_pliegues=5, seed=params["seed"])
+    for base, cfg in ((n, MODELOS[n]) for n in elegidos):
+        nombre = base if regimen == "bloques" else base.replace("cv-", "cv-grupos-", 1)
+        d, res = ejecutar(nombre, cfg, X, y, pliegues, params, regimen)
         print("\n", nombre)
         print(d.round(4).to_string())
         print({k: round(v, 4) for k, v in res.items() if k.endswith("_media")})
