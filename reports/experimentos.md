@@ -163,3 +163,7 @@ Operacionalización (fijada por el asistente antes de ejecutar; ajustable):
 - Hipótesis: **no se cumple.** El umbral óptimo con el piso de 0,95 no está cerca de 0,5 (fuera del rango 0,40–0,60), sino cerca de 0,7. Con 0,5 el recall es 0,977, es decir, mucho más alto que el piso, y se pagan unas 390 falsas alarmas más por pliegue (923 frente a 536) que con 0,68. El umbral 0,5 solo sería el óptimo con un piso de recall de ~0,977.
 - El sesgo hacia umbrales bajos es una decisión de costos, no estadística: cada paso hacia abajo compra recall con falsas alarmas (de 0,68 a 0,50: +2,2 puntos de recall a cambio de +387 falsas alarmas por pliegue).
 - Cautela: 0,68 y 0,70 dejan muy poco margen sobre el piso (recall mínimo 0,953 y 0,950), y el modelo final reajustado con todo el entrenamiento puede dar probabilidades algo distintas. No se usó la prueba.
+
+### Decisión del umbral (usuario)
+
+Se elige el **umbral 0,6** para el modelo `cv-grupos-xgboost-optuna`. Razón: pasar de 0,6 a 0,68 solo gana 0,006 de precisión (0,971 a 0,977) y deja un margen mínimo sobre el piso de recall; con 0,6 el recall fuera de muestra es 0,966 (mínimo por pliegue 0,964) y hay unas 696 falsas alarmas por pliegue. La decisión se tomó con predicciones fuera de muestra, sin usar la prueba.
