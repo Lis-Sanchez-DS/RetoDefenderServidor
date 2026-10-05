@@ -8,3 +8,4 @@ prefect
 dvc
 pytest
 xgboost
+optuna

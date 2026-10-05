@@ -24,3 +24,4 @@ mlflow.db
 
 # Configuración local de Claude Code (no se publica)
 .claude/
+optuna.db

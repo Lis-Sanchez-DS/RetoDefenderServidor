@@ -49,3 +49,6 @@ Por qué no pliegues contiguos puros ni validación hacia adelante en el tiempo:
 Limitación: no se han eliminado los duplicados exactos, que pueden seguir cruzando pliegues; y los pliegues no reproducen el cambio de sesión de captura que sí aparece en prueba.
 
 Ambos modelos (regresión logística y XGBoost) se entrenan con los mismos pliegues y el mismo preprocesamiento para que la comparación sea justa.
+
+## Piso de recall elevado a 0,95
+Desde este punto, el piso de recall del criterio "mayor precisión con recall mínimo" pasa de 0,90 a **0,95** (decisión del equipo). Los experimentos 1 a 4 se evaluaron con el piso de 0,90 y así se conservan; la columna `precision_con_recall_090` de sus ejecuciones sigue siendo válida, y desde la búsqueda de hiperparámetros se registra también `precision_con_recall_095`. El recall sigue siendo la prioridad principal por el criterio de costo; el piso puede volver a subirse.
