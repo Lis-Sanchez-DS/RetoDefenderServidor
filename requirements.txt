@@ -9,3 +9,4 @@ dvc
 pytest
 xgboost
 optuna
+dvc-s3
