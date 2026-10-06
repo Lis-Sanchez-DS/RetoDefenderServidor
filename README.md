@@ -4,11 +4,9 @@ Proyecto de MLOps: distinguir tráfico normal de ataques en UNSW-NB15, con datos
 experimentos, modelos y pipeline reproducibles (Git + DVC + MLflow + Prefect).
 
 ## Estado
-Hecho: exploración y documentación de datos, línea base, 6 experimentos (regresión logística y XGBoost, validación cruzada por bloques y por grupos, búsqueda con Optuna, elección de umbral), seguimiento en MLflow y versionado de datos y modelos con DVC.
+Completo: exploración y documentación de datos, línea base, 6 experimentos con hipótesis previas, evaluación única en la prueba, pipeline de Prefect, script de predicción, versionado con DVC (remoto en Cloudflare R2) y MLflow.
 
-Modelo candidato: XGBoost ajustado con Optuna (`cv-grupos-xgboost-optuna`), umbral 0,6.
-
-Pendiente: evaluación final única en la prueba, pipeline de Prefect real, remoto de DVC y demostración de recuperación, decisión final.
+Modelo final: XGBoost con hiperparámetros de Optuna, umbral 0,6. Decisión, errores y limitaciones en `reports/decision_final.md`.
 
 ## Instalación
 ```bash
@@ -40,6 +38,8 @@ UNSW-NB15 (UNSW Canberra). Fuente, versión, condiciones de uso y sumas de verif
 - `docs/exploracion.md` — exploración: tamaños, capturas, variables, categóricas.
 - `docs/decisiones.md` — decisiones y su justificación (costos, codificación, `proto`, piso de recall, validación cruzada, Optuna, umbral).
 - `docs/duplicados.md` — filas casi idénticas, intentos y la decisión de pliegues por grupos.
+- `reports/decision_final.md` — decisión final breve y respuestas de la defensa.
+- `docs/pipeline.md`, `docs/evidencia_modelos.md`, `docs/recuperacion.md` — pipeline, elección por evidencia y reconstrucción desde cero.
 - `reports/experimentos.md` — los experimentos con la hipótesis escrita antes de entrenar, resultados y conclusiones.
 
 ## Cómo reproducir
