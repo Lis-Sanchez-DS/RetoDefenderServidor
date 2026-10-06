@@ -8,6 +8,18 @@ validación y lo registra en MLflow con el umbral congelado.
 No evalúa en el conjunto de prueba: esa evaluación se hace una sola vez, aparte
 (`src/evaluar_test.py`). Cada etapa falla con un mensaje que dice qué falló y por qué.
 
+Decisiones del pipeline y su razón (detalle en docs/decisiones.md y reports/experimentos.md):
+  - Pliegues por grupos (filas con las mismas 42 entradas van juntas): las filas casi idénticas
+    de una ráfaga de tráfico inflaban la validación con pliegues por bloques.
+  - Criterio de elección: máxima precisión con recall >= 0,95 en cada pliegue. Un ataque no
+    detectado cuesta más que una falsa alarma, así que el recall es un piso y la precisión
+    lo que se maximiza.
+  - Umbral 0,6 fijo (experimento 6): sube de 0,6 a 0,68 solo 0,006 de precisión y deja un
+    margen mínimo sobre el piso; se prefiere una falsa alarma a un ataque sin revisar.
+  - Sin evaluación en la prueba: se hizo una vez con el modelo y el umbral congelados; repetirla
+    aquí la volvería parte del ajuste.
+  - Sin búsqueda de Optuna: es un experimento aparte (42 min); aquí se usan sus mejores parámetros.
+
 Uso:
     .venv/bin/python -m src.pipeline.flow                  # ejecución completa (~5 min)
     .venv/bin/python -m src.pipeline.flow --muestra 0.05   # ejecución rápida con 5 % de las filas
@@ -72,6 +84,8 @@ def preparar_datos(params: dict, muestra: float | None):
     if y.nunique() != 2 or X.isna().all().any():
         raise EtapaFallida("el entrenamiento no tiene las dos clases o tiene columnas vacías")
     pliegues = pliegues_por_grupos(X, y, n_pliegues=params["pipeline"]["n_pliegues"], seed=params["seed"])
+    log.info("DECISIÓN: se verifica el md5 contra DVC antes de entrenar, para que el resultado se pueda atribuir a una versión exacta de los datos")
+    log.info("DECISIÓN: pliegues por grupos de filas con entradas idénticas, para que una ráfaga de tráfico casi igual no quede a ambos lados de la validación")
     log.info(f"datos verificados (md5 {real[:8]}): {len(X)} filas, {y.mean():.1%} ataques, {len(pliegues)} pliegues por grupos")
     return X, y, pliegues, real
 
@@ -98,6 +112,7 @@ def _candidatos(params: dict) -> dict:
 @task(name="entrenar-modelo")
 def entrenar_modelo(nombre, cfg, X, y, pliegues, params, md5_datos, muestra=None):
     """Validación cruzada por grupos y reajuste final de un candidato; todo en MLflow."""
+    _log().info(f"DECISIÓN: {nombre} se valida con los mismos pliegues y el mismo preprocesamiento que los demás candidatos, para que la comparación sea justa")
     etiquetas = {"pipeline": "prefect", "prefect_flow_run": str(flow_run.id), "datos_md5": md5_datos,
                  "muestra": str(muestra or 1.0)}
     try:
@@ -126,6 +141,7 @@ def comparar_experimentos(resultados: list, params: dict):
     tabla = pd.DataFrame(filas).sort_values("precision_con_recall_095", ascending=False)
     Path("reports").mkdir(exist_ok=True)
     tabla.drop(columns="run_id").to_csv("reports/pipeline_comparacion.csv", index=False)
+    log.info(f"DECISIÓN: solo se admiten modelos con recall >= {piso} en todos los pliegues con el umbral {umbral} (un ataque perdido cuesta más que una falsa alarma); entre ellos, gana la mayor precisión con recall >= 0,95")
     log.info("comparación (validación, umbral %.2f):\n%s", umbral, tabla.drop(columns="run_id").round(4).to_string(index=False))
     admisibles = tabla[tabla.recall_min_umbral >= piso]
     if admisibles.empty:
@@ -149,6 +165,7 @@ def registrar_modelo(elegido: dict, params: dict, muestra: float | None = None):
         cliente.set_registered_model_alias(p["modelo_registrado"], "candidato", version.version)
     except Exception as e:
         raise EtapaFallida(f"no se pudo registrar el modelo: {type(e).__name__}: {e}") from e
+    _log().info("DECISIÓN: se guarda el umbral como etiqueta de la versión; el modelo se registra como `candidato`, no como producción, porque la prueba final es una evaluación aparte")
     _log().info(f"registrado {p['modelo_registrado']} v{version.version} (origen {elegido['modelo']}, umbral {p['umbral']})")
     return version.version
 
