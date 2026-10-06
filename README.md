@@ -54,3 +54,9 @@ UNSW-NB15 (UNSW Canberra). Fuente, versión, condiciones de uso y sumas de verif
 .venv/bin/pytest
 ```
 Las bases `mlflow.db` y `optuna.db` son locales y no se versionan.
+
+## Predecir con un modelo guardado
+```bash
+.venv/bin/python -m src.predecir entrada.csv [salida.csv]   # modelo registrado en MLflow, umbral 0,6
+```
+Más sobre el pipeline en `docs/pipeline.md` y sobre la elección del modelo en `docs/evidencia_modelos.md`.
