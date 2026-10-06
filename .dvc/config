@@ -1,0 +1,6 @@
+[core]
+    remote = almacen
+['remote "almacen"']
+    url = s3://pipeline-mlops
+    endpointurl = https://40a7a6b0319ad6887e3098c98b0e311c.r2.cloudflarestorage.com
+    region = auto
