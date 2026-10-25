@@ -25,7 +25,7 @@ sha256sum $RAW/particion_oficial/*.csv
 [ "$(sha256sum $RAW/particion_oficial/UNSW_NB15_training-set.csv | cut -d' ' -f1)" = "$ANEXO_TRAIN" ] && echo "training: coincide con el anexo"
 [ "$(sha256sum $RAW/particion_oficial/UNSW_NB15_testing-set.csv | cut -d' ' -f1)" = "$ANEXO_TEST" ] && echo "testing: coincide con el anexo"
 echo "== 5. Modelos desde Hugging Face por SHA completo, y predicción de la misma muestra"
-.venv/bin/python -I -m src.recuperacion recuperar evidencias/recuperacion 2>&1 | grep -v -E "INFO|Warning"
+.venv/bin/python -m src.recuperacion recuperar evidencias/recuperacion 2>&1 | grep -v -E "INFO|Warning"
 echo "== 6. Comparación con las salidas guardadas antes"
-.venv/bin/python -I -m src.recuperacion comparar evidencias/recuperacion
+.venv/bin/python -m src.recuperacion comparar evidencias/recuperacion
 echo "== fin"; date -u
