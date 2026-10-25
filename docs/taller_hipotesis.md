@@ -24,7 +24,7 @@ Este espacio de búsqueda permite encontrar una configuración de XGBoost que ma
 
 **C4 — Análisis de umbral**
 Alcance (decisión del usuario): el modelo de C3 (Optuna) evaluado en validación con umbrales de 0,30 a 0,90 en pasos de 0,01; v1 (C2) conserva el umbral 0,5. Cuenta como la cuarta configuración; en el informe se aclara que cambia el umbral de un modelo ya entrenado y no se entrena de nuevo.
-(Pendiente: hipótesis del usuario, antes de ejecutar.)
+Hipótesis del usuario: Al intentar optimizar con el mejor threshold, el nuevo modelo podrá balancear más los Falsos positivos con los falsos negativos y por ende hallar un mejor f1-score, que es lo que se busca optimizar en esta última etapa.
 
 ## v1 frente a v2
 Definición (decisión del usuario): **v1 = modelo de C3 (XGBoost con Optuna) con umbral 0,5; v2 = el mismo modelo con el mejor umbral, elegido en el análisis C4 solo con validación.** Los dos comparten el archivo del modelo (mismo SHA-256) y se distinguen por el umbral y la configuración publicada.
