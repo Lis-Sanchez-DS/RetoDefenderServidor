@@ -1,0 +1,16 @@
+{
+  "fuente": "solo conjunto de entrenamiento de la partici\u00f3n fija; CV de 3 pliegues por grupos",
+  "mejor_precision_umbral05_con_recall_minimo_095": 0.9598469728290788,
+  "mejores_parametros": {
+    "n_estimators": 673,
+    "max_depth": 10,
+    "learning_rate": 0.2042763462452091,
+    "min_child_weight": 12,
+    "subsample": 0.9160438591311897,
+    "colsample_bytree": 0.867424993128136,
+    "reg_alpha": 4.010241910880936e-06,
+    "reg_lambda": 4.411788064588638
+  },
+  "pruebas_completas": 22,
+  "pruebas_totales": 25
+}
