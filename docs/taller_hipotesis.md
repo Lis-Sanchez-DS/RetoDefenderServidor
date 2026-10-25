@@ -23,3 +23,7 @@ Se utiliza esta nueva configuración para revisar la variabilidad de los resulta
 **C4 — XGBoost con búsqueda de Optuna (25 pruebas, solo con la parte de entrenamiento) — v2**
 Este espacio de búsqueda permite encontrar una configuración de XGBoost que mantenga un buen recall (≥ 0,95) y reduzca de forma significativa el número de falsos positivos.
 (Qué cuenta como "significativa" lo decide el usuario al ver los datos de C4.)
+
+## v1 frente a v2 (hipótesis del usuario)
+Se espera que con respecto al XGBoost base, Optuna logre obtener un mejor desempeño al lograr optimizar los hiperparámetros para el problema presente.
+(v1 = C2, XGBoost con hiperparámetros por defecto; v2 = C4, XGBoost con búsqueda de Optuna. Se corrigió "CGBoost" por "XGBoost".)
