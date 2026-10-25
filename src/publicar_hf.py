@@ -71,17 +71,19 @@ def preparar(carpeta, version, sel, e, repo):
     ficha = sel[version]
     f = e.loc[ficha["config_id"]]
     cid = ficha["config_id"]
-    desc = {"C2": "regresión logística con variables numéricas estandarizadas y categóricas (one-hot)",
-            "C4": "XGBoost con hiperparámetros de Optuna (búsqueda solo con entrenamiento) y categóricas (one-hot)",
-            "C3": "XGBoost (300 árboles, profundidad 6, tasa 0,1) con categóricas (one-hot)"}[cid]
+    desc = {"C2": "XGBoost estándar (300 árboles, profundidad 6, tasa 0,1) con variables numéricas y categóricas (one-hot)",
+            "C4": "XGBoost con hiperparámetros y umbral de una búsqueda de Optuna hecha solo con entrenamiento, con categóricas (one-hot)",
+            "C3": "XGBoost de Optuna con umbral 0,5"}[cid]
     extra = ""
     if version == "v2":
         v1 = sel["v1"]["metricas_validacion"]
         v2 = ficha["metricas_validacion"]
         extra = ("## Cambios frente a v1 (validación)\n"
-                 f"v2 cambia el modelo (lineal → árboles potenciados) y el umbral ({sel['v1']['umbral']} → {ficha['umbral']}). "
+                 f"v2 cambia los hiperparámetros (búsqueda de Optuna hecha solo con entrenamiento) y el umbral ({sel['v1']['umbral']} → {ficha['umbral']}). "
                  f"Precisión {v1['precision']:.4f} → {v2['precision']:.4f}; recall {v1['recall']:.4f} → {v2['recall']:.4f}; "
-                 f"FPR {v1['fpr']:.4f} → {v2['fpr']:.4f}. Ver `evidencias/experimentos.csv` del repositorio de código.\n\n")
+                 f"falsas alarmas {v1['fp']:.0f} → {v2['fp']:.0f}; ataques perdidos {v1['fn']:.0f} → {v2['fn']:.0f}. "
+                 "La mejora en precisión proviene sobre todo del umbral: con umbral 0,5 el modelo de v2 no supera a v1. "
+                 "Se aceptan más ataques perdidos a cambio de menos falsas alarmas. Ver `evidencias/experimentos.csv` del repositorio de código.\n\n")
     shutil.copy(ficha["archivo_modelo"], carpeta / "model.joblib")
     shutil.copy("requirements.lock.txt", carpeta / "requirements.txt")
     json.dump({"version": version, "config_id": cid, "umbral": ficha["umbral"], "clase_positiva": "ataque (label=1)",
