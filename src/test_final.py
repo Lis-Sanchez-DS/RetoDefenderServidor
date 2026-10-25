@@ -22,9 +22,9 @@ def sha256(ruta):
 
 def main():
     sel = json.load(open("evidencias/seleccion.json"))
-    cid = sel["modelo_para_test"]
-    ficha = next(sel[v] for v in ("v1", "v2") if sel[v]["config_id"] == cid)
-    version = next(v for v in ("v1", "v2") if sel[v]["config_id"] == cid)
+    version = sel["modelo_para_test"]
+    ficha = sel[version]
+    cid = ficha["config_id"]
     ruta = ficha["archivo_modelo"]
     assert sha256(ruta) == ficha["modelo_sha256"], "el modelo no coincide con el congelado"
     if Path("evidencias/metricas-test.json").exists():

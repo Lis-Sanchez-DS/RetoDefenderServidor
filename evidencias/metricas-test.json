@@ -1,0 +1,43 @@
+{
+  "version": "v2",
+  "config_id": "C4",
+  "run_id": "6d7cb635a3104e838d81b205f2d51b49",
+  "modelo_sha256": "e7f7ddc749f2a22c66007031110f9658b1803b3f306f8e3c4e032c52cdac7ed4",
+  "hash_dataset_sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559",
+  "filas_evaluadas": 82332,
+  "umbral": 0.66,
+  "regla": "y_pred = 1 si score_attack >= umbral",
+  "clase_positiva": "ataque (label = 1)",
+  "matriz_confusion": {
+    "tn": 29856,
+    "fp": 7144,
+    "fn": 1589,
+    "tp": 43743
+  },
+  "metricas": {
+    "recall": 0.9649474984558369,
+    "precision": 0.8596105095603985,
+    "tasa_falsos_positivos": 0.19308108108108107,
+    "macro_f1": 0.8908234016527836,
+    "accuracy": 0.8939294563474712,
+    "mcc": 0.7902531295031585,
+    "roc_auc": 0.9819334450814532,
+    "pr_auc": 0.9867583452285351,
+    "fp_por_10000": 867.7063596171598,
+    "fn_por_10000": 192.99907690812807
+  },
+  "recall_por_familia_de_ataque": {
+    "Analysis": 0.9468,
+    "Backdoor": 0.9983,
+    "DoS": 0.9956,
+    "Exploits": 0.9887,
+    "Fuzzers": 0.7715,
+    "Generic": 0.9997,
+    "Reconnaissance": 0.9977,
+    "Shellcode": 0.9788,
+    "Worms": 0.9773
+  },
+  "denominadores_cero": "precision/recall con zero_division=0; FPR = FP/(FP+TN)",
+  "nota": "evaluación única; las filas con estados no vistos (no, ACC, CLO) se codifican con ceros",
+  "limite": "10,4 % de las filas de test tienen un vector de entrada idéntico en entrenamiento (evidencias/auditoria.json)"
+}
