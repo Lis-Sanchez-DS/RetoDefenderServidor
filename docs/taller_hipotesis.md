@@ -23,14 +23,13 @@ Este espacio de búsqueda permite encontrar una configuración de XGBoost que ma
 (Qué cuenta como "significativa" lo decide el usuario al ver los datos de C3.)
 
 **C4 — XGBoost con una nueva búsqueda de Optuna que incluye el umbral — v2** (decisión del usuario)
-Segunda búsqueda de Optuna, solo con la parte de entrenamiento, en la que el umbral de decisión es un parámetro más. Hipótesis del usuario: (pendiente, antes de ejecutar).
-Detalles por fijar con el usuario: objetivo de la búsqueda y número de pruebas.
+Segunda búsqueda de Optuna (25 pruebas), solo con la parte de entrenamiento (validación cruzada interna de 3 pliegues por grupos), en la que el umbral de decisión (de 0,30 a 0,90, continuo) se busca junto con los hiperparámetros. Objetivo (decisión del usuario): maximizar la precisión exigiendo recall medio >= 0,95 en el umbral de cada prueba.
+Hipótesis del usuario (el texto anterior con «precisión» en lugar de «f1-score», por indicación del usuario): Al intentar optimizar con el mejor threshold, el nuevo modelo podrá balancear más los Falsos positivos con los falsos negativos y por ende hallar una mejor precisión, que es lo que se busca optimizar en esta última etapa.
 
 Registro (reemplazado por el cambio de definición de C4, 2026-10-25): C4 era un análisis de umbral del modelo de C3 en 0,30-0,90 (paso 0,01), maximizando el macro-F1 con recall >= 0,95. Hipótesis del usuario entonces: "Al intentar optimizar con el mejor threshold, el nuevo modelo podrá balancear más los Falsos positivos con los falsos negativos y por ende hallar un mejor f1-score, que es lo que se busca optimizar en esta última etapa".
 
 ## v1 frente a v2
 Definición vigente (decisión del usuario): **v1 = C2 (XGBoost estándar, umbral 0,5); v2 = C4 (búsqueda de Optuna que incluye el umbral).** Archivos de modelo distintos.
-Hipótesis del usuario: (pendiente; la anterior se conserva abajo como registro).
+Hipótesis del usuario (restaurada tal cual): Se espera que con respecto al XGBoost base, Optuna logre obtener un mejor desempeño al lograr optimizar los hiperparámetros para el problema presente.
 
-Registro 1 (reemplazado): "Se espera que con respecto al XGBoost base, Optuna logre obtener un mejor desempeño al lograr optimizar los hiperparámetros para el problema presente."
 Registro 2 (definición anterior, descartada): v1 = modelo de C3 con umbral 0,5 y v2 = el mismo modelo con el mejor umbral.

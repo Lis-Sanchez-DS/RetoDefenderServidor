@@ -35,6 +35,7 @@ PISO_RECALL = 0.95
 EXPERIMENTO = "taller-evaluable-70-30"
 REJILLA = np.round(np.arange(0.05, 0.96, 0.05), 2)
 PARAMETROS_OPTUNA = "reports/optuna_taller_mejores_parametros.json"
+PARAMETROS_OPTUNA_UMBRAL = "reports/optuna_taller_umbral_mejores_parametros.json"
 
 
 def configuraciones():
@@ -54,6 +55,12 @@ def configuraciones():
     if mejores:
         cfgs["C3"] = dict(nombre="xgboost-optuna", familia="arboles-xgboost", categoricas=True, escalar=False, criterio="precision",
                           clasificador=xgb(**mejores), parametros={"modelo": "XGBClassifier", "origen": "optuna", **mejores})
+    if Path(PARAMETROS_OPTUNA_UMBRAL).exists():
+        c4 = dict(json.load(open(PARAMETROS_OPTUNA_UMBRAL))["mejores_parametros"])
+        u = c4.pop("umbral")
+        cfgs["C4"] = dict(nombre="xgboost-optuna-umbral", familia="arboles-xgboost", categoricas=True, escalar=False, criterio="precision",
+                          clasificador=xgb(**c4), parametros={"modelo": "XGBClassifier", "origen": "optuna-con-umbral", **c4},
+                          umbral=u)
     return cfgs
 
 
@@ -108,6 +115,8 @@ def main():
         r05 = metricas(y, (prob >= 0.5).astype(int))
         p95 = punto_con_recall_minimo(y, prob, PISO_RECALL)
         rp = metricas(y, (prob >= p95["umbral"]).astype(int)) if not np.isnan(p95["umbral"]) else {}
+        u_propio = cfg.get("umbral")
+        ru = metricas(y, (prob >= u_propio).astype(int)) if u_propio is not None else {}
         ruta = Path(f"models/taller-{cid}.joblib")
         ruta.parent.mkdir(exist_ok=True)
         joblib.dump(modelo, ruta)
@@ -122,17 +131,20 @@ def main():
                              "modelo_sha256": sha256(ruta), "etapa": "validacion",
                              "denominador_cero": "precision y recall con zero_division=0; FPR = FP/(FP+TN), nunca 0/0 (hay normales)",
                              **ref_datos})
-            mlflow.log_params({**cfg["parametros"], "seed": seed, "categoricas": cfg["categoricas"], "umbral_reporte": 0.5,
+            mlflow.log_params({**cfg["parametros"], "seed": seed, "categoricas": cfg["categoricas"], "umbral_reporte": 0.5, "umbral_propio": u_propio if u_propio is not None else "ninguno",
                                "piso_recall": PISO_RECALL, "filas_entrenamiento": len(X_tr), "filas_validacion": len(X_val)})
             mlflow.log_metrics({
                 **{f"val_{k}": float(v) for k, v in r05.items()},
                 "val_roc_auc": roc_auc_score(y, prob), "val_pr_auc": average_precision_score(y, prob),
+                **{f"val_upropio_{k}": float(v) for k, v in ru.items()},
                 "val_p95_precision": p95["precision"], "val_p95_umbral": p95["umbral"],
                 **{f"val_p95_{k}": float(v) for k, v in rp.items()}})
             mlflow.sklearn.log_model(modelo, name="modelo", serialization_format="cloudpickle")
             run_id = mlflow.active_run().info.run_id
         print(cid, cfg["nombre"], run_id)
         print("umbral 0,5:", {k: round(float(v), 4) for k, v in r05.items()})
+        if ru:
+            print(f"umbral propio {u_propio:.4f}:", {k: round(float(v), 4) for k, v in ru.items()})
         print("max precisión con recall >= 0,95:", {k: round(float(v), 4) for k, v in {**p95, **{"recall": rp.get("recall", float("nan"))}}.items()})
         print("roc_auc", round(roc_auc_score(y, prob), 4))
 
