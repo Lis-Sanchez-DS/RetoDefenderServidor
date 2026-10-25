@@ -1,0 +1,64 @@
+{
+  "congelado_utc": "2026-10-25T21:24:03+00:00",
+  "evidencia_de_congelacion": "esta selección se commitea antes de que existan evidencias/metricas-test.json y predicciones-test.csv; ver `git log -- evidencias/seleccion.json evidencias/metricas-test.json`",
+  "criterio": "decisión del usuario con datos de validación únicamente (partición fija 70/30); la prueba no se usó",
+  "solo_validacion": true,
+  "v1": {
+    "config_id": "C2",
+    "run_id": "18fbcc33e83041e7ad99c7937583159d",
+    "modelo_sha256": "7fef2e3afa957bd67cd48fe5f72eb4d1eb49285832480632a37ed4012e9bb8fd",
+    "umbral": 0.5,
+    "archivo_modelo": "models/taller-C2.joblib",
+    "dvc_modelo": "models/taller-C2.joblib.dvc",
+    "git_commit_codigo_que_lo_produjo": "4c3fb7cd71cb4ec71466199197ed5c71218cbe7b",
+    "dvc_datos_originales_md5": "e55caabaa6cd4a8f1c06a227bcfababc",
+    "dvc_datos_preparados_md5": "a869e919c9a8a014fa6c7aec00446ce5",
+    "razon": "XGBoost estándar (300 árboles, profundidad 6, tasa 0,1) con umbral 0,5: primera solución funcional.",
+    "metricas_validacion": {
+      "recall": 0.9747793542620936,
+      "precision": 0.9608247990309438,
+      "tasa_falsos_positivos": 0.08469733944408071,
+      "macro_f1": 0.9487208180895129,
+      "tn": 15378.0,
+      "fp": 1423.0,
+      "fn": 903.0,
+      "tp": 34901.0
+    },
+    "huggingface": {
+      "repositorio": null,
+      "revision_sha": null,
+      "tag": null,
+      "nota": "se completa tras publicar (src/publicar_hf.py); no modifica los campos congelados"
+    }
+  },
+  "v2": {
+    "config_id": "C4",
+    "run_id": "6d7cb635a3104e838d81b205f2d51b49",
+    "modelo_sha256": "e7f7ddc749f2a22c66007031110f9658b1803b3f306f8e3c4e032c52cdac7ed4",
+    "umbral": 0.66,
+    "archivo_modelo": "models/taller-C4.joblib",
+    "dvc_modelo": "models/taller-C4.joblib.dvc",
+    "git_commit_codigo_que_lo_produjo": "cb33d74015cbc76fd504ea4c38b15d63f9979fc5",
+    "dvc_datos_originales_md5": "e55caabaa6cd4a8f1c06a227bcfababc",
+    "dvc_datos_preparados_md5": "a869e919c9a8a014fa6c7aec00446ce5",
+    "razon": "Modelo de la búsqueda de Optuna (solo entrenamiento) con umbral 0,66 elegido por el usuario a partir del umbral hallado (0,6607): más precisión y menos falsas alarmas que v1 a costa de más ataques perdidos (recall 0,954 frente a 0,975).",
+    "metricas_validacion": {
+      "recall": 0.9537481845603843,
+      "precision": 0.9737652560739135,
+      "tasa_falsos_positivos": 0.05475864531873103,
+      "macro_f1": 0.9443169265075975,
+      "tn": 15881.0,
+      "fp": 920.0,
+      "fn": 1656.0,
+      "tp": 34148.0
+    },
+    "huggingface": {
+      "repositorio": null,
+      "revision_sha": null,
+      "tag": null,
+      "nota": "se completa tras publicar (src/publicar_hf.py); no modifica los campos congelados"
+    }
+  },
+  "modelo_para_test": "v2",
+  "razon_modelo_para_test": "v2 es la solución final; v1 no se evalúa en la prueba (la comparación v1/v2 es en validación)"
+}
