@@ -1,5 +1,5 @@
 outs:
-- md5: 2df09e1c1830eb95cdc4680c4d96d1ff
-  size: 7552542
+- md5: a869e919c9a8a014fa6c7aec00446ce5
+  size: 7499934
   hash: md5
   path: particion_entrenamiento_validacion.csv

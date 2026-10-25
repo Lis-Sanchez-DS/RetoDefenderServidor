@@ -5,7 +5,7 @@ data:
   version: TBD   # documentar fuente y versión una vez descargado
 split:
   test_size: 0.2
-  val_size: 0.2
+  val_size: 0.3
 pipeline:
   piso_recall: 0.95        # recall mínimo exigido en cada pliegue (ver docs/decisiones.md)
   umbral: 0.6              # umbral congelado (experimento 6)

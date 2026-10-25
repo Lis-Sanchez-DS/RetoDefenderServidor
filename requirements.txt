@@ -10,3 +10,4 @@ pytest
 xgboost
 optuna
 dvc-s3
+huggingface_hub

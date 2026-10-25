@@ -8,6 +8,7 @@ usan los cuatro experimentos. Uso: .venv/bin/python -m src.particion
 import hashlib
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import yaml
 from sklearn.model_selection import StratifiedGroupKFold
@@ -32,9 +33,10 @@ def crear(seed: int = 42, val_size: float = 0.2) -> pd.DataFrame:
     df = pd.read_csv(RUTA.format("training"))
     df = df[~df["state"].isin(ESTADOS_EXCLUIDOS_ENTRENAMIENTO)].reset_index(drop=True)
     grupo = grupos_de_entradas(df)
-    n_pliegues = round(1 / val_size)
-    cv = StratifiedGroupKFold(n_splits=n_pliegues, shuffle=True, random_state=seed)
-    _, i_val = next(iter(cv.split(df, df["label"], grupo)))
+    # val_size = k/10: se unen k pliegues de un StratifiedGroupKFold de 10 (estratificado y por grupos)
+    k = round(val_size * 10)
+    cv = StratifiedGroupKFold(n_splits=10, shuffle=True, random_state=seed)
+    i_val = np.concatenate([val for _, val in list(cv.split(df, df["label"], grupo))[:k]])
     conjunto = pd.Series("entrenamiento", index=df.index)
     conjunto.iloc[i_val] = "validacion"
     return pd.DataFrame({"row_id": row_id("training", df["id"]), "id": df["id"], "conjunto": conjunto.values,
