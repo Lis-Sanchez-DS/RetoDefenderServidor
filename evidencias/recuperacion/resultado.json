@@ -1,0 +1,28 @@
+{
+  "entrada_sha256": "7f1c08f27b6e2d770f4767e3242960ce6c11ed626a7dff77a23f6f2958a14eae",
+  "filas": 50,
+  "tolerancia_probabilidades": 1e-09,
+  "versiones": {
+    "v1": {
+      "revision_hf": "053f3e62f144e78e055533f82bce14c9b54e3030",
+      "modelo_sha256": "7fef2e3afa957bd67cd48fe5f72eb4d1eb49285832480632a37ed4012e9bb8fd",
+      "umbral": 0.5,
+      "predicciones_identicas": true,
+      "diferencia_maxima_en_probabilidad": 0.0,
+      "aprobado": true,
+      "salidas_originales_sha256": "10bc316c057d1d83971688bf80459749896e45acd5734fd3347fea620a4a6a03",
+      "salidas_recuperadas_sha256": "10bc316c057d1d83971688bf80459749896e45acd5734fd3347fea620a4a6a03"
+    },
+    "v2": {
+      "revision_hf": "c521d5ccf41ad404998e3364c685363ffa620bbb",
+      "modelo_sha256": "e7f7ddc749f2a22c66007031110f9658b1803b3f306f8e3c4e032c52cdac7ed4",
+      "umbral": 0.66,
+      "predicciones_identicas": true,
+      "diferencia_maxima_en_probabilidad": 0.0,
+      "aprobado": true,
+      "salidas_originales_sha256": "3c128f6d032035887fbef8fb2d518c40a39915934905617290aff128cc9ad04d",
+      "salidas_recuperadas_sha256": "3c128f6d032035887fbef8fb2d518c40a39915934905617290aff128cc9ad04d"
+    }
+  },
+  "resultado": "APROBADA"
+}

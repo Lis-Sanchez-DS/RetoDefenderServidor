@@ -1,0 +1,31 @@
+== 1. Código: clonar y fijar la revisión
+Sun Oct 25 23:43:49 UTC 2026
+48047163b023e68728aa1594929775871ec0da1e
+== 2. Entorno nuevo con dependencias fijadas
+Python 3.14.4
+No broken requirements found.
+== 3. Datos con DVC desde el remoto (caché nueva)
+A       data/processed/particion_entrenamiento_validacion.csv
+A       data/processed/validacion_taller-C2.csv
+A       data/processed/validacion_taller-C4.csv
+A       data/raw/unsw-nb15/metadatos/NUSW-NB15_features.csv
+A       data/raw/unsw-nb15/particion_oficial/UNSW_NB15_testing-set.csv
+A       data/raw/unsw-nb15/particion_oficial/UNSW_NB15_training-set.csv
+6 files fetched and 6 files added
+Data and pipelines are up to date.
+== 4. Huellas de los datos originales frente al anexo del taller
+734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559  data/raw/unsw-nb15/particion_oficial/UNSW_NB15_testing-set.csv
+bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa  data/raw/unsw-nb15/particion_oficial/UNSW_NB15_training-set.csv
+training: coincide con el anexo
+testing: coincide con el anexo
+== 5. Modelos desde Hugging Face por SHA completo, y predicción de la misma muestra
+v1: revisión 053f3e62f144e78e055533f82bce14c9b54e3030 descargada; hash del modelo coincide; umbral 0.5
+v1: 50 filas, 28 marcadas como ataque -> salidas_recuperadas_v1.csv
+v2: revisión c521d5ccf41ad404998e3364c685363ffa620bbb descargada; hash del modelo coincide; umbral 0.66
+v2: 50 filas, 27 marcadas como ataque -> salidas_recuperadas_v2.csv
+== 6. Comparación con las salidas guardadas antes
+v1 predicciones idénticas: True | diferencia máxima de probabilidad: 0.0 | OK
+v2 predicciones idénticas: True | diferencia máxima de probabilidad: 0.0 | OK
+prueba de recuperación: APROBADA
+== fin
+Sun Oct 25 23:49:05 UTC 2026
