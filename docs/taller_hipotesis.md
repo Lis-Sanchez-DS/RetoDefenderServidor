@@ -23,6 +23,7 @@ Este espacio de búsqueda permite encontrar una configuración de XGBoost que ma
 (Qué cuenta como "significativa" lo decide el usuario al ver los datos de C3.)
 
 **C4 — Análisis de umbral**
+Alcance (decisión del usuario): el modelo de C3 (Optuna) evaluado en validación con umbrales de 0,30 a 0,90 en pasos de 0,01; v1 (C2) conserva el umbral 0,5. Cuenta como la cuarta configuración; en el informe se aclara que cambia el umbral de un modelo ya entrenado y no se entrena de nuevo.
 (Pendiente: hipótesis del usuario, antes de ejecutar.)
 
 ## v1 frente a v2 (hipótesis del usuario)
