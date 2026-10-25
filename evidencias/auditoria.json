@@ -1,0 +1,176 @@
+{
+  "fuente": {
+    "url": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",
+    "fecha_descarga": "2026-10-05",
+    "nota": "descarga manual de la carpeta oficial; huellas coinciden con las del anexo del taller (mirror)"
+  },
+  "archivos": {
+    "training": {
+      "archivo": "UNSW_NB15_training-set.csv",
+      "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa",
+      "filas": 175341,
+      "columnas": 45,
+      "clases_label": {
+        "0": 56000,
+        "1": 119341
+      },
+      "clases_attack_cat": {
+        "Normal": 56000,
+        "Generic": 40000,
+        "Exploits": 33393,
+        "Fuzzers": 18184,
+        "DoS": 12264,
+        "Reconnaissance": 10491,
+        "Analysis": 2000,
+        "Backdoor": 1746,
+        "Shellcode": 1133,
+        "Worms": 130
+      },
+      "faltantes_total": 0,
+      "faltantes_por_columna": {},
+      "tipos": {
+        "int64": 30,
+        "float64": 11,
+        "str": 4
+      },
+      "duplicados_por_entradas": {
+        "vectores_distintos": 101040,
+        "filas_copia_de_otra": 74301,
+        "grupos_con_mas_de_una_fila": 9748,
+        "grupos_con_etiquetas_contradictorias": 229,
+        "filas_en_grupos_contradictorios": 940
+      }
+    },
+    "testing": {
+      "archivo": "UNSW_NB15_testing-set.csv",
+      "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559",
+      "filas": 82332,
+      "columnas": 45,
+      "clases_label": {
+        "0": 37000,
+        "1": 45332
+      },
+      "clases_attack_cat": {
+        "Normal": 37000,
+        "Generic": 18871,
+        "Exploits": 11132,
+        "Fuzzers": 6062,
+        "DoS": 4089,
+        "Reconnaissance": 3496,
+        "Analysis": 677,
+        "Backdoor": 583,
+        "Shellcode": 378,
+        "Worms": 44
+      },
+      "faltantes_total": 0,
+      "faltantes_por_columna": {},
+      "tipos": {
+        "int64": 30,
+        "float64": 11,
+        "str": 4
+      },
+      "duplicados_por_entradas": {
+        "vectores_distintos": 53946,
+        "filas_copia_de_otra": 28386,
+        "grupos_con_mas_de_una_fila": 6318,
+        "grupos_con_etiquetas_contradictorias": 6,
+        "filas_en_grupos_contradictorios": 14
+      }
+    }
+  },
+  "variables": {
+    "usadas_como_entrada": [
+      "dur",
+      "proto",
+      "service",
+      "state",
+      "spkts",
+      "dpkts",
+      "sbytes",
+      "dbytes",
+      "rate",
+      "sttl",
+      "dttl",
+      "sload",
+      "dload",
+      "sloss",
+      "dloss",
+      "sinpkt",
+      "dinpkt",
+      "sjit",
+      "djit",
+      "swin",
+      "stcpb",
+      "dtcpb",
+      "dwin",
+      "tcprtt",
+      "synack",
+      "ackdat",
+      "smean",
+      "dmean",
+      "trans_depth",
+      "response_body_len",
+      "ct_srv_src",
+      "ct_state_ttl",
+      "ct_dst_ltm",
+      "ct_src_dport_ltm",
+      "ct_dst_sport_ltm",
+      "ct_dst_src_ltm",
+      "is_ftp_login",
+      "ct_ftp_cmd",
+      "ct_flw_http_mthd",
+      "ct_src_ltm",
+      "ct_srv_dst",
+      "is_sm_ips_ports"
+    ],
+    "n_entradas": 42,
+    "excluidas": [
+      "id",
+      "label",
+      "attack_cat"
+    ],
+    "motivo": {
+      "label": "respuesta",
+      "attack_cat": "revela la respuesta",
+      "id": "identifica filas; solo para auditoría y relacionar predicciones"
+    }
+  },
+  "politica_de_limpieza": {
+    "duplicados": "no se eliminan; las filas con el mismo vector de entrada forman un grupo y se asignan juntas a entrenamiento o validación",
+    "contradicciones": "grupos con etiquetas distintas se conservan (error irreducible) y van juntos a un mismo conjunto",
+    "estados_excluidos_en_entrenamiento": [
+      "no",
+      "ACC",
+      "CLO"
+    ],
+    "filas_excluidas_en_entrenamiento": 1,
+    "test": "no se elimina ninguna fila; los estados no vistos se codifican con ceros (OneHotEncoder handle_unknown)",
+    "imputacion": "no hay faltantes"
+  },
+  "particion": {
+    "semilla": 42,
+    "metodo": "StratifiedGroupKFold(5, shuffle) fold 0 como validación; grupo = vector de entrada idéntico",
+    "archivo": "data/processed/particion_entrenamiento_validacion.csv",
+    "sha256_archivo": "42f58f1a8172f23ce836d3f5aa9dedb77e067585cd99b0aae1bca7d5c65ca85c",
+    "filas": {
+      "entrenamiento": 140271,
+      "validacion": 35069
+    },
+    "ataques_por_conjunto": {
+      "entrenamiento": 0.6806,
+      "validacion": 0.6806
+    },
+    "huellas_row_id": {
+      "entrenamiento": "a9f5cd0be0199325640f9ee44f5b9cf3317427b24b371350470477d6902ddd93",
+      "validacion": "f7b66b7beb7b49e101203b455867b48978e046f809700f0d7cbbc7c53edeb3a0"
+    },
+    "grupos_repartidos_entre_entrenamiento_y_validacion": 0
+  },
+  "cruces_entre_particiones": {
+    "filas_test_con_vector_identico_en_entrenamiento_oficial": 8541,
+    "porcentaje_test": 10.37,
+    "filas_test_con_vector_identico_en_validacion": 1456,
+    "vectores_test_con_etiqueta_distinta_a_la_de_entrenamiento": 279,
+    "limite": "solapamiento medido solo con entradas; el rendimiento en test es optimista en las filas con gemela en entrenamiento"
+  }
+}

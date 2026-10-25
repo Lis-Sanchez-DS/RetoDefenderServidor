@@ -1,0 +1,5 @@
+outs:
+- md5: 3ff695906adc83734e2b636ad0330304
+  size: 1124190
+  hash: md5
+  path: validacion_taller-C0.csv

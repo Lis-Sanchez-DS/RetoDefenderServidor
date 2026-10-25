@@ -1,0 +1,5 @@
+outs:
+- md5: 6b17afb6461f6975bad87f7874616be5
+  size: 825551
+  hash: md5
+  path: taller-C2.joblib

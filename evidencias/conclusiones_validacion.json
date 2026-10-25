@@ -1,0 +1,5 @@
+{
+  "C0": "Línea base (siempre ataque) en la partición 70/30: recall 1,000, precisión 0,6806, tasa de falsos positivos 1,000, macro-F1 0,405.",
+  "C1": "Hipótesis se cumple (veredicto del usuario). Con umbral 0,5: macro-F1 0,921 frente a 0,405 de la línea base, tasa de falsos positivos 0,179 frente a 1,000, recall 0,988 (443 ataques perdidos). Máxima precisión con recall >= 0,95: 0,9505.",
+  "C2": "Hipótesis se cumple (veredicto del usuario). Máxima precisión con recall >= 0,95: 0,9765 frente a 0,9505 de C1 (819 falsas alarmas frente a 1.771). Con umbral 0,5 pierde más ataques (903 frente a 443)."
+}
