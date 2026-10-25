@@ -106,6 +106,7 @@ def main():
     e = pd.read_csv("evidencias/experimentos.csv").set_index("config_id")
     api = HfApi()
     api.create_repo(repo, repo_type="model", private="--publico" not in sys.argv, exist_ok=True)
+    api.update_repo_settings(repo, private="--publico" not in sys.argv, repo_type="model")  # fuerza la visibilidad pedida
     for version in ("v1", "v2"):
         with tempfile.TemporaryDirectory() as tmp:
             carpeta = Path(tmp)
