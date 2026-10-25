@@ -92,7 +92,7 @@ def preparar(carpeta, version, sel, e, repo):
                "git_commit_codigo": ficha["git_commit_codigo_que_lo_produjo"],
                "dvc_datos_originales_md5": ficha["dvc_datos_originales_md5"], "dvc_datos_preparados_md5": ficha["dvc_datos_preparados_md5"],
                "metricas_validacion": ficha["metricas_validacion"]}, open(carpeta / "config.json", "w"), indent=2)
-    m = ficha["metricas_validacion"]
+    m = {**ficha["metricas_validacion"], "fpr": ficha["metricas_validacion"]["tasa_falsos_positivos"]}
     (carpeta / "README.md").write_text(TARJETA.format(
         version=version, config_id=cid, descripcion=desc, umbral=ficha["umbral"], sha=ficha["modelo_sha256"], extra=extra, repo=repo,
         commit=ficha["git_commit_codigo_que_lo_produjo"], dvc_orig=ficha["dvc_datos_originales_md5"],

@@ -25,10 +25,9 @@
       "tp": 34901.0
     },
     "huggingface": {
-      "repositorio": null,
-      "revision_sha": null,
-      "tag": null,
-      "nota": "se completa tras publicar (src/publicar_hf.py); no modifica los campos congelados"
+      "repositorio": "LisSanchez-DS/defender-servidor",
+      "revision_sha": "053f3e62f144e78e055533f82bce14c9b54e3030",
+      "tag": "v1"
     }
   },
   "v2": {
@@ -53,10 +52,9 @@
       "tp": 34148.0
     },
     "huggingface": {
-      "repositorio": null,
-      "revision_sha": null,
-      "tag": null,
-      "nota": "se completa tras publicar (src/publicar_hf.py); no modifica los campos congelados"
+      "repositorio": "LisSanchez-DS/defender-servidor",
+      "revision_sha": "c521d5ccf41ad404998e3364c685363ffa620bbb",
+      "tag": "v2"
     }
   },
   "modelo_para_test": "v2",
