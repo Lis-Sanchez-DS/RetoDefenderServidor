@@ -9,26 +9,28 @@ Evidencia de que esas son sus métricas: ejecución `baseline-clase-dominante` e
 ## Criterio de evaluación
 - C1: se busca maximizar el recall (un ataque perdido cuesta más que una falsa alarma); se reporta con umbral 0,5.
 - C2 y C3: **maximizar la precisión con recall de al menos 0,95**. Por ahora todas las comparaciones usan umbral 0,5; la elección del umbral es el análisis C4.
-- C4 (decisión del usuario): el umbral se elige maximizando el **macro-F1** entre los umbrales con **recall >= 0,95**, en validación.
 - Se descartó la configuración «XGBoost más profundo» (a petición del usuario): su hipótesis y su ejecución se eliminaron; en la corrida solo se vio que difería de C2 en menos de 0,001 de precisión.
 
 ## Hipótesis
 **C1 — Regresión logística** (variables numéricas estandarizadas y categóricas codificadas)
 Con todas las variables numéricas estandarizadas y las categóricas codificadas, la regresión logística supera con claridad a la línea base (macro-F1 0,415) y, sobre todo, deja de alarmar todo el tráfico normal (tasa de falsos positivos muy por debajo de 1,00).
 
-**C2 — XGBoost con hiperparámetros por defecto (300 árboles, profundidad 6, tasa 0,1)**
+**C2 — XGBoost con hiperparámetros por defecto (300 árboles, profundidad 6, tasa 0,1) — v1**
 Al enfocarse en la precisión, XGBoost lo hará mejor que la regresión logística gracias a su mayor complejidad. La interpretabilidad no es prioritaria en este problema, así que se aceptan modelos más complejos siempre que funcionen.
 
-**C3 — XGBoost con búsqueda de Optuna (25 pruebas, solo con la parte de entrenamiento) — base de v1 y v2**
+**C3 — XGBoost con búsqueda de Optuna (25 pruebas, solo con la parte de entrenamiento, umbral fijo 0,5)**
 Este espacio de búsqueda permite encontrar una configuración de XGBoost que mantenga un buen recall (≥ 0,95) y reduzca de forma significativa el número de falsos positivos.
 (Qué cuenta como "significativa" lo decide el usuario al ver los datos de C3.)
 
-**C4 — Análisis de umbral**
-Alcance (decisión del usuario): el modelo de C3 (Optuna) evaluado en validación con umbrales de 0,30 a 0,90 en pasos de 0,01; v1 (C2) conserva el umbral 0,5. Cuenta como la cuarta configuración; en el informe se aclara que cambia el umbral de un modelo ya entrenado y no se entrena de nuevo.
-Hipótesis del usuario: Al intentar optimizar con el mejor threshold, el nuevo modelo podrá balancear más los Falsos positivos con los falsos negativos y por ende hallar un mejor f1-score, que es lo que se busca optimizar en esta última etapa.
+**C4 — XGBoost con una nueva búsqueda de Optuna que incluye el umbral — v2** (decisión del usuario)
+Segunda búsqueda de Optuna, solo con la parte de entrenamiento, en la que el umbral de decisión es un parámetro más. Hipótesis del usuario: (pendiente, antes de ejecutar).
+Detalles por fijar con el usuario: objetivo de la búsqueda y número de pruebas.
+
+Registro (reemplazado por el cambio de definición de C4, 2026-10-25): C4 era un análisis de umbral del modelo de C3 en 0,30-0,90 (paso 0,01), maximizando el macro-F1 con recall >= 0,95. Hipótesis del usuario entonces: "Al intentar optimizar con el mejor threshold, el nuevo modelo podrá balancear más los Falsos positivos con los falsos negativos y por ende hallar un mejor f1-score, que es lo que se busca optimizar en esta última etapa".
 
 ## v1 frente a v2
-Definición (decisión del usuario): **v1 = modelo de C3 (XGBoost con Optuna) con umbral 0,5; v2 = el mismo modelo con el mejor umbral, elegido en el análisis C4 solo con validación.** Los dos comparten el archivo del modelo (mismo SHA-256) y se distinguen por el umbral y la configuración publicada.
-Hipótesis del usuario: (pendiente, antes de ejecutar C4).
+Definición vigente (decisión del usuario): **v1 = C2 (XGBoost estándar, umbral 0,5); v2 = C4 (búsqueda de Optuna que incluye el umbral).** Archivos de modelo distintos.
+Hipótesis del usuario: (pendiente; la anterior se conserva abajo como registro).
 
-Hipótesis anterior, reemplazada por el cambio de definición (se conserva como registro): "Se espera que con respecto al XGBoost base, Optuna logre obtener un mejor desempeño al lograr optimizar los hiperparámetros para el problema presente." Su contenido se evalúa ahora en la comparación C2 frente a C3.
+Registro 1 (reemplazado): "Se espera que con respecto al XGBoost base, Optuna logre obtener un mejor desempeño al lograr optimizar los hiperparámetros para el problema presente."
+Registro 2 (definición anterior, descartada): v1 = modelo de C3 con umbral 0,5 y v2 = el mismo modelo con el mejor umbral.
