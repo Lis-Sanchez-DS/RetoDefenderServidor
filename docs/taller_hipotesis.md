@@ -9,6 +9,7 @@ Evidencia de que esas son sus métricas: ejecución `baseline-clase-dominante` e
 ## Criterio de evaluación
 - C1: se busca maximizar el recall (un ataque perdido cuesta más que una falsa alarma); se reporta con umbral 0,5.
 - C2 y C3: **maximizar la precisión con recall de al menos 0,95**. Por ahora todas las comparaciones usan umbral 0,5; la elección del umbral es el análisis C4.
+- C4 (decisión del usuario): el umbral se elige maximizando el **macro-F1** entre los umbrales con **recall >= 0,95**, en validación.
 - Se descartó la configuración «XGBoost más profundo» (a petición del usuario): su hipótesis y su ejecución se eliminaron; en la corrida solo se vio que difería de C2 en menos de 0,001 de precisión.
 
 ## Hipótesis
