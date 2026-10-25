@@ -25,8 +25,7 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
 
-from src.baseline import metricas
-from src.validacion_cruzada import punto_con_recall_minimo
+from src.metricas import metricas, punto_con_recall_minimo
 from src.datos import separar_xy
 from src.particion import SALIDA, cargar_particion
 from src.preprocesamiento import columnas_numericas, construir_preprocesamiento
@@ -34,8 +33,8 @@ from src.preprocesamiento import columnas_numericas, construir_preprocesamiento
 PISO_RECALL = 0.95
 EXPERIMENTO = "taller-evaluable-70-30"
 REJILLA = np.round(np.arange(0.05, 0.96, 0.05), 2)
-PARAMETROS_OPTUNA = "reports/optuna_taller_mejores_parametros.json"
-PARAMETROS_OPTUNA_UMBRAL = "reports/optuna_taller_umbral_mejores_parametros.json"
+PARAMETROS_OPTUNA = "configs/optuna_c3_mejores_parametros.json"
+PARAMETROS_OPTUNA_UMBRAL = "configs/optuna_c4_mejores_parametros.json"
 
 
 def configuraciones():

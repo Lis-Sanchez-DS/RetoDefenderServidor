@@ -24,6 +24,8 @@ mlflow.db
 
 # Configuración local de Claude Code (no se publica)
 .claude/
-optuna.db
 Defiende-el-servidor-taller-evaluable-2026-10-16.pdf
 optuna_taller.db
+
+# Bases locales de las búsquedas de Optuna
+optuna*.db

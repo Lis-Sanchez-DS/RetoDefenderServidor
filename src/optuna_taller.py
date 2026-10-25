@@ -11,14 +11,35 @@ import sys
 import numpy as np
 import optuna
 import yaml
+from sklearn.pipeline import Pipeline
+from xgboost import XGBClassifier
 
 from src.datos import pliegues_por_grupos, separar_xy
-from src.optuna_xgboost import modelo, parametros
 from src.particion import cargar_particion
-from src.baseline import metricas
-from src.validacion_cruzada import PISO_RECALL_NUEVO
+from src.metricas import PISO_RECALL_NUEVO, metricas
+from src.preprocesamiento import columnas_numericas, construir_preprocesamiento
 
 UMBRAL = 0.5
+
+
+def parametros(trial):
+    return dict(
+        n_estimators=trial.suggest_int("n_estimators", 100, 800),
+        max_depth=trial.suggest_int("max_depth", 3, 10),
+        learning_rate=trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+        min_child_weight=trial.suggest_int("min_child_weight", 1, 20),
+        subsample=trial.suggest_float("subsample", 0.5, 1.0),
+        colsample_bytree=trial.suggest_float("colsample_bytree", 0.5, 1.0),
+        reg_alpha=trial.suggest_float("reg_alpha", 1e-8, 10.0, log=True),
+        reg_lambda=trial.suggest_float("reg_lambda", 1e-3, 10.0, log=True),
+    )
+
+
+def modelo(X, seed, **p):
+    return Pipeline([
+        ("preprocesamiento", construir_preprocesamiento(columnas_numericas(X), True, False)),
+        ("clasificador", XGBClassifier(tree_method="hist", random_state=seed, n_jobs=4, **p)),
+    ])
 
 
 def main(n_pruebas=25, con_umbral=False):
@@ -53,7 +74,7 @@ def main(n_pruebas=25, con_umbral=False):
     json.dump({"fuente": "solo conjunto de entrenamiento de la partición fija; CV de 3 pliegues por grupos",
                "mejor_precision_umbral05_con_recall_minimo_095": estudio.best_value, "mejores_parametros": estudio.best_params,
                "pruebas_completas": len(completas), "pruebas_totales": len(estudio.trials)},
-              open(f"reports/optuna_taller{'_umbral' if con_umbral else ''}_mejores_parametros.json", "w"), indent=2)
+              open(f"configs/optuna_{'c4' if con_umbral else 'c3'}_mejores_parametros.json", "w"), indent=2)
     print("mejor", round(estudio.best_value, 4), estudio.best_params, "| completas", len(completas))
 
 

@@ -11,9 +11,8 @@ from pathlib import Path
 import joblib
 import pandas as pd
 
-from src.baseline import metricas
 from src.datos import RUTA, separar_xy
-from src.evaluar_test import todas_las_metricas
+from src.metricas import todas_las_metricas
 
 
 def sha256(ruta):

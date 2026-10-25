@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from src.baseline import metricas
+from src.metricas import metricas
 
 VERSIONES = {"v1": ("C2", 0.5), "v2": ("C4", 0.66)}  # decisiones del usuario
 RAZON = {
