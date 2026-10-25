@@ -50,12 +50,9 @@ def configuraciones():
         "C2": dict(nombre="xgboost-defecto", familia="arboles-xgboost", categoricas=True, escalar=False, criterio="precision",
                    clasificador=xgb(n_estimators=300, max_depth=6, learning_rate=0.1),
                    parametros={"modelo": "XGBClassifier", "n_estimators": 300, "max_depth": 6, "learning_rate": 0.1}),
-        "C3": dict(nombre="xgboost-profundo", familia="arboles-xgboost", categoricas=True, escalar=False, criterio="precision",
-                   clasificador=xgb(n_estimators=600, max_depth=10, learning_rate=0.05),
-                   parametros={"modelo": "XGBClassifier", "n_estimators": 600, "max_depth": 10, "learning_rate": 0.05}),
     }
     if mejores:
-        cfgs["C4"] = dict(nombre="xgboost-optuna", familia="arboles-xgboost", categoricas=True, escalar=False, criterio="precision",
+        cfgs["C3"] = dict(nombre="xgboost-optuna", familia="arboles-xgboost", categoricas=True, escalar=False, criterio="precision",
                           clasificador=xgb(**mejores), parametros={"modelo": "XGBClassifier", "origen": "optuna", **mejores})
     return cfgs
 

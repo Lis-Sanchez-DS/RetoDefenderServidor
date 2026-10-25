@@ -8,7 +8,8 @@ Evidencia de que esas son sus métricas: ejecución `baseline-clase-dominante` e
 
 ## Criterio de evaluación
 - C1: se busca maximizar el recall (un ataque perdido cuesta más que una falsa alarma); se reporta con umbral 0,5.
-- C2, C3 y C4: **maximizar la precisión con recall de al menos 0,95**.
+- C2 y C3: **maximizar la precisión con recall de al menos 0,95**. Por ahora todas las comparaciones usan umbral 0,5; la elección del umbral es el análisis C4.
+- Se descartó la configuración «XGBoost más profundo» (a petición del usuario): su hipótesis y su ejecución se eliminaron; en la corrida solo se vio que difería de C2 en menos de 0,001 de precisión.
 
 ## Hipótesis
 **C1 — Regresión logística** (variables numéricas estandarizadas y categóricas codificadas)
@@ -17,13 +18,13 @@ Con todas las variables numéricas estandarizadas y las categóricas codificadas
 **C2 — XGBoost con hiperparámetros por defecto (300 árboles, profundidad 6, tasa 0,1) — v1**
 Al enfocarse en la precisión, XGBoost lo hará mejor que la regresión logística gracias a su mayor complejidad. La interpretabilidad no es prioritaria en este problema, así que se aceptan modelos más complejos siempre que funcionen.
 
-**C3 — XGBoost más profundo (profundidad 10, 600 árboles, tasa 0,05)**
-Se utiliza esta nueva configuración para revisar la variabilidad de los resultados obtenidos por el XGBoost con respecto a sus hiperparámetros. Si vemos un cambio significativo podemos saber que realizar una búsqueda de hiperparámetros es relevante para este problema.
-
-**C4 — XGBoost con búsqueda de Optuna (25 pruebas, solo con la parte de entrenamiento) — v2**
+**C3 — XGBoost con búsqueda de Optuna (25 pruebas, solo con la parte de entrenamiento) — v2**
 Este espacio de búsqueda permite encontrar una configuración de XGBoost que mantenga un buen recall (≥ 0,95) y reduzca de forma significativa el número de falsos positivos.
-(Qué cuenta como "significativa" lo decide el usuario al ver los datos de C4.)
+(Qué cuenta como "significativa" lo decide el usuario al ver los datos de C3.)
+
+**C4 — Análisis de umbral**
+(Pendiente: hipótesis del usuario, antes de ejecutar.)
 
 ## v1 frente a v2 (hipótesis del usuario)
 Se espera que con respecto al XGBoost base, Optuna logre obtener un mejor desempeño al lograr optimizar los hiperparámetros para el problema presente.
-(v1 = C2, XGBoost con hiperparámetros por defecto; v2 = C4, XGBoost con búsqueda de Optuna. Se corrigió "CGBoost" por "XGBoost".)
+(v1 = C2, XGBoost con hiperparámetros por defecto; v2 = C3, XGBoost con búsqueda de Optuna. Se corrigió "CGBoost" por "XGBoost".)
