@@ -7,7 +7,9 @@ Uso: .venv/bin/python -m src.seleccion
 """
 import json
 import subprocess
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 
@@ -26,6 +28,8 @@ def git(*a):
 
 
 def main():
+    if Path("evidencias/seleccion.json").exists() and "--rehacer" not in sys.argv:
+        raise SystemExit("la selección ya está congelada (evidencias/seleccion.json); no se rehace. --rehacer solo para rehacerla a propósito")
     e = pd.read_csv("evidencias/experimentos.csv").set_index("config_id")
 
     def ficha(version):

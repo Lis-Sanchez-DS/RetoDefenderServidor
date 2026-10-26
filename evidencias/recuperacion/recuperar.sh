@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Prueba de recuperación en una carpeta y un entorno nuevos (sin cachés de datos, modelos ni pip).
-# Uso:  HF_TOKEN=<token de lectura> bash recuperar.sh <carpeta_nueva_vacía> <url_o_ruta_del_repositorio> <commit>
+# Uso:  bash recuperar.sh <carpeta_nueva_vacía> <url_o_ruta_del_repositorio> <commit>
+# (El repositorio de Hugging Face es público: no hace falta token. Durante la prueba original era privado y se usó HF_TOKEN.)
 # Antes: copiar las credenciales de lectura del remoto DVC a <carpeta>/proyecto/.dvc/config.local (no van a Git);
 #        con el script: DVC_CONFIG_LOCAL=<ruta del config.local>.
 set -euo pipefail

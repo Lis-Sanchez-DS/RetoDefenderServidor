@@ -47,13 +47,14 @@ sha256sum data/raw/unsw-nb15/particion_oficial/*.csv
 ```
 
 ## Ejecutar un experimento
-Requiere los datos del paso anterior. Cada configuración (C0 línea base, C1 regresión logística, C2 XGBoost estándar, C3 y C4 con Optuna) se entrena con la partición fija 70/30 y queda en MLflow (experimento `taller-evaluable-70-30`):
+Requiere los datos del paso anterior. Cada configuración (C0 línea base, C1 regresión logística, C2 XGBoost estándar, C3 y C4 con Optuna) se entrena con la partición fija 70/30 y queda en MLflow:
 ```bash
-.venv/bin/python -m src.taller_experimentos C2      
+.venv/bin/python -m src.taller_experimentos C2
 .venv/bin/mlflow ui --backend-store-uri sqlite:///mlflow.db
-.venv/bin/python -m src.exportar_mlflow                # regenera evidencias/experimentos.csv y evidencias/mlflow/
 ```
+Es una **reproducción segura**: el modelo, las puntuaciones y las curvas se guardan en `reproduccion/` (ignorada por Git), la ejecución va al experimento `taller-evaluable-70-30-reproduccion` y al final se compara el hash del modelo con el congelado (en el equipo de desarrollo, C2 se reprodujo con el mismo hash; el entrenamiento multihilo de XGBoost podría variar en otro equipo). No toca `models/` ni `evidencias/`. La opción `--oficial` escribe sobre los artefactos congelados y solo sirve para regenerar las evidencias originales.
 Las búsquedas de Optuna (C3: ~35 min, C4: ~15 min en 16 núcleos): `python -m src.optuna_taller` y `python -m src.optuna_taller --umbral`. Las hipótesis (escritas antes de entrenar) están en [`docs/taller_hipotesis.md`](docs/taller_hipotesis.md).
+Los scripts que fijan evidencias (`src.particion`, `src.seleccion`, `src.publicar_hf`) se niegan a rehacerlas si ya existen, y `src.exportar_mlflow` no toca `evidencias/` si no encuentra las ejecuciones de MLflow (se necesita el `mlflow.db` original).
 
 ## Descargar cada modelo y predecir
 El repositorio de Hugging Face es público, así que no hace falta iniciar sesión ni usar ningún token. Las revisiones salen de `evidencias/seleccion.json`; el script verifica el hash del modelo y aplica el umbral publicado:

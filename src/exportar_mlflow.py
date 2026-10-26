@@ -25,6 +25,8 @@ def main():
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     conclusiones = json.load(open("evidencias/conclusiones_validacion.json"))
     runs = mlflow.search_runs(experiment_names=["taller-evaluable-70-30"], output_format="list")
+    if not runs:
+        raise SystemExit("no hay ejecuciones de MLflow en este entorno (falta mlflow.db): no se toca evidencias/")
     ultimas = {}
     for r in sorted(runs, key=lambda r: r.info.start_time):
         ultimas[r.data.tags["config_id"]] = r  # la última de cada configuración

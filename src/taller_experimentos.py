@@ -4,7 +4,14 @@ Misma partición fija, mismo preprocesamiento (ajustado solo con entrenamiento) 
 métricas de validación. Cada ejecución queda en MLflow (experimento `taller-evaluable-70-30`)
 con hipótesis, parámetros, semilla, versión de datos, commit, métricas y el modelo
 completo; además se guarda `models/taller-<id>.joblib` y sus probabilidades de validación.
-El conjunto de prueba no se toca. Uso: .venv/bin/python -m src.taller_experimentos C0 [C1 C2 ...]
+El conjunto de prueba no se toca.
+
+Uso: .venv/bin/python -m src.taller_experimentos [--oficial] C0 [C1 C2 ...]
+Por defecto es una REPRODUCCIÓN segura: los modelos, las puntuaciones y las curvas van a `reproduccion/` (ignorada por Git),
+las ejecuciones de MLflow van al experimento `taller-evaluable-70-30-reproduccion` y al final se compara el hash del modelo
+con el congelado (el entrenamiento multihilo de XGBoost puede no ser idéntico bit a bit). Con `--oficial` se escribe en
+`models/`, `data/processed/` y `evidencias/curvas/` y se registra en el experimento oficial: solo para regenerar las
+evidencias, porque SOBRESCRIBE los artefactos congelados.
 """
 import hashlib
 import json
@@ -97,10 +104,24 @@ def main():
     entrenamiento, validacion = cargar_particion()
     X_tr, y_tr = separar_xy(entrenamiento)
     X_val, y_val = separar_xy(validacion)
-    mlflow.set_tracking_uri("sqlite:///mlflow.db")
-    mlflow.set_experiment(EXPERIMENTO)
+    oficial = "--oficial" in sys.argv
+    elegidos = [a for a in sys.argv[1:] if not a.startswith("--")]
     cfgs = configuraciones()
-    elegidos = sys.argv[1:]
+    if not elegidos or any(c not in cfgs for c in elegidos):
+        raise SystemExit(f"indica configuraciones válidas ({', '.join(cfgs)}); ver el modo de uso al inicio del archivo")
+    if oficial:
+        dir_modelos, dir_val, dir_curvas = Path("models"), Path("data/processed"), Path("evidencias/curvas")
+    else:
+        base = Path("reproduccion")
+        dir_modelos, dir_val, dir_curvas = base / "models", base, base / "curvas"
+    for d in (dir_modelos, dir_val, dir_curvas):
+        d.mkdir(parents=True, exist_ok=True)
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_experiment(EXPERIMENTO if oficial else EXPERIMENTO + "-reproduccion")
+    congelados = {}
+    if Path("evidencias/seleccion.json").exists():
+        sel = json.load(open("evidencias/seleccion.json"))
+        congelados = {sel[v]["config_id"]: sel[v]["modelo_sha256"] for v in ("v1", "v2")}
     ref_datos = {"dvc_md5_datos_originales_training": md5_dvc("data/raw/unsw-nb15/particion_oficial/UNSW_NB15_training-set.csv.dvc"),
                  "dvc_md5_datos_preparados_particion": md5_dvc(f"{SALIDA}.dvc")}
     for cid in elegidos:
@@ -116,13 +137,11 @@ def main():
         rp = metricas(y, (prob >= p95["umbral"]).astype(int)) if not np.isnan(p95["umbral"]) else {}
         u_propio = cfg.get("umbral")
         ru = metricas(y, (prob >= u_propio).astype(int)) if u_propio is not None else {}
-        ruta = Path(f"models/taller-{cid}.joblib")
-        ruta.parent.mkdir(exist_ok=True)
+        ruta = dir_modelos / f"taller-{cid}.joblib"
         joblib.dump(modelo, ruta)
         pd.DataFrame({"row_id": [f"training:{i}" for i in validacion["id"]], "y_true": y, "score_attack": prob}).to_csv(
-            f"data/processed/validacion_taller-{cid}.csv", index=False)
-        Path("evidencias/curvas").mkdir(parents=True, exist_ok=True)
-        curva(y, prob).to_csv(f"evidencias/curvas/curva_validacion_{cid}.csv", index=False)
+            dir_val / f"validacion_taller-{cid}.csv", index=False)
+        curva(y, prob).to_csv(dir_curvas / f"curva_validacion_{cid}.csv", index=False)
         with mlflow.start_run(run_name=f"taller-{cid}-{cfg['nombre']}"):
             mlflow.set_tags({"config_id": cid, "familia": cfg["familia"], "hipotesis": hipotesis(cid),
                              "criterio": cfg["criterio"], "git_commit": git("rev-parse", "HEAD"),
@@ -146,6 +165,10 @@ def main():
             print(f"umbral propio {u_propio:.4f}:", {k: round(float(v), 4) for k, v in ru.items()})
         print("max precisión con recall >= 0,95:", {k: round(float(v), 4) for k, v in {**p95, **{"recall": rp.get("recall", float("nan"))}}.items()})
         print("roc_auc", round(roc_auc_score(y, prob), 4))
+        if cid in congelados and not oficial:
+            igual = sha256(ruta) == congelados[cid]
+            print(f"modelo guardado en {ruta}; hash {'IGUAL' if igual else 'distinto'} al congelado de seleccion.json"
+                  + ("" if igual else " (el entrenamiento multihilo de XGBoost puede variar; el modelo congelado se recupera con DVC o Hugging Face)"))
 
 
 if __name__ == "__main__":

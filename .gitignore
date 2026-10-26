@@ -29,3 +29,6 @@ optuna*.db
 informe/informe.pdf
 informe/logo_externado.png
 informe/umbral_v2.png
+
+# Reproducciones de los experimentos (no tocan los artefactos congelados)
+reproduccion/

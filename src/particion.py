@@ -6,6 +6,7 @@ entrenamiento y validación. La asignación se guarda en un CSV que versiona DVC
 usan los cuatro experimentos. Uso: .venv/bin/python -m src.particion
 """
 import hashlib
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -59,6 +60,8 @@ def cargar_particion():
 
 
 if __name__ == "__main__":
+    if SALIDA.exists() and "--rehacer" not in sys.argv:
+        raise SystemExit(f"{SALIDA} ya existe (versionado con DVC); no se rehace. --rehacer solo para crear otra partición a propósito")
     params = yaml.safe_load(open("params.yaml"))
     p = crear(params["seed"], params["split"]["val_size"])
     SALIDA.parent.mkdir(parents=True, exist_ok=True)

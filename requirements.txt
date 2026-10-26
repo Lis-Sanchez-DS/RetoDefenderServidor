@@ -1,13 +1,12 @@
 pandas
 numpy
 scikit-learn
-matplotlib
 joblib
+pyyaml
 mlflow
-prefect
-dvc
-pytest
 xgboost
 optuna
+dvc
 dvc-s3
 huggingface_hub
+pytest

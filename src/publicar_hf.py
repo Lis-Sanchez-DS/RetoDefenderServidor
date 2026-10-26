@@ -103,6 +103,8 @@ def main():
     import pandas as pd
     repo = sys.argv[1]
     sel = json.load(open("evidencias/seleccion.json"))
+    if sel["v1"]["huggingface"]["revision_sha"] and "--republicar" not in sys.argv:
+        raise SystemExit("v1 y v2 ya están publicados (SHA en evidencias/seleccion.json); --republicar crearía otras revisiones y los tags no se moverían")
     e = pd.read_csv("evidencias/experimentos.csv").set_index("config_id")
     api = HfApi()
     api.create_repo(repo, repo_type="model", private="--publico" not in sys.argv, exist_ok=True)

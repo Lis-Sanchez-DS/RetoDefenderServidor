@@ -101,3 +101,34 @@ def test_auditoria_describe_la_particion_vigente():
     p = pd.read_csv(SALIDA)
     assert a["sha256_archivo"] == hashlib.sha256(Path(SALIDA).read_bytes()).hexdigest()
     assert a["filas"] == {k: int(n) for k, n in p.conjunto.value_counts().items()}
+
+
+def test_exportar_mlflow_no_borra_evidencias_si_no_hay_ejecuciones(tmp_path, monkeypatch):
+    """En un clon sin mlflow.db, exportar no debe vaciar evidencias/ (antes borraba los JSON y el CSV)."""
+    (tmp_path / "evidencias/mlflow").mkdir(parents=True)
+    (tmp_path / "evidencias/mlflow/x.json").write_text("{}")
+    (tmp_path / "evidencias/experimentos.csv").write_text("config_id\nC2\n")
+    (tmp_path / "evidencias/conclusiones_validacion.json").write_text("{}")
+    monkeypatch.chdir(tmp_path)
+    from src import exportar_mlflow
+    with pytest.raises(SystemExit):
+        exportar_mlflow.main()
+    assert (tmp_path / "evidencias/mlflow/x.json").exists() and "C2" in (tmp_path / "evidencias/experimentos.csv").read_text()
+
+
+def test_la_seleccion_congelada_no_se_rehace(tmp_path, monkeypatch):
+    (tmp_path / "evidencias").mkdir()
+    (tmp_path / "evidencias/seleccion.json").write_text('{"congelado": true}')
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.argv", ["seleccion"])
+    from src import seleccion
+    with pytest.raises(SystemExit):
+        seleccion.main()
+    assert (tmp_path / "evidencias/seleccion.json").read_text() == '{"congelado": true}'
+
+
+def test_experimentos_exige_configuracion_valida(monkeypatch):
+    monkeypatch.setattr("sys.argv", ["taller_experimentos"])
+    from src import taller_experimentos
+    with pytest.raises(SystemExit):
+        taller_experimentos.main()
