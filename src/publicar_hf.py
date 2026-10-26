@@ -69,7 +69,6 @@ Código: commit Git `{commit}` · Datos DVC: originales `{dvc_orig}`, preparados
 
 def preparar(carpeta, version, sel, e, repo):
     ficha = sel[version]
-    f = e.loc[ficha["config_id"]]
     cid = ficha["config_id"]
     desc = {"C2": "XGBoost estándar (300 árboles, profundidad 6, tasa 0,1) con variables numéricas y categóricas (one-hot)",
             "C4": "XGBoost con hiperparámetros y umbral de una búsqueda de Optuna hecha solo con entrenamiento, con categóricas (one-hot)",
