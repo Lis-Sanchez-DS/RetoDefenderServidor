@@ -38,6 +38,7 @@
 | `metricas-test.json` | Versión y hash del modelo evaluado (v2), hash del dataset, 82,332 filas, umbral, clase positiva, matriz de confusión y métricas |
 | `predicciones-test.csv` | `row_id` (`testing:<id>`), `y_true`, `score_attack`, `y_pred`; regla: `y_pred = 1` si `score_attack >= umbral` |
 | `mlflow/` | Exportación de los runs (parámetros, métricas, etiquetas); `curvas/` curvas de umbral en validación |
+| `../informe/informe.pdf` | Informe (3 páginas de contenido más referencias); `informe/generar_informe.py` lo genera desde estos archivos y `tests/test_informe.py` comprueba que sus cifras coinciden |
 | `recuperacion/` | 50 filas fijas de validación, salidas de v1/v2 antes y después, hashes, comandos (`recuperar.sh`), log y `resultado.json` (**APROBADA**, diferencia máxima de probabilidad 0.0) |
 
 ## 4. Almacenamiento DVC
@@ -50,6 +51,7 @@ Instalación, recuperación de datos, entrenamiento y predicción: ver `README.m
 - Benchmark histórico de laboratorio (2015). La validación estima rendimiento en distribución; el 10,4 % de las filas de prueba tiene una entrada idéntica en entrenamiento.
 - En la prueba la precisión de v2 cae a 0.860 (0,974 en validación) y la tasa de falsos positivos sube a 0.193; la causa no está demostrada.
 - El conjunto de prueba ya se había evaluado antes, con otro modelo, en una versión anterior del trabajo (otra guía); no se usó para elegir el modelo ni el umbral actuales. Los commits registrados en MLflow para C0-C2 son anteriores a mover funciones auxiliares a `src/metricas.py` (movidas sin cambios).
+- **Fe de erratas:** las tarjetas inmutables de v1 y v2 en Hugging Face (revisiones `053f3e62…` y `c521d5cc…`) indican por error los tamaños de una partición 80/20 descartada (140.271 y 35.069 filas); los tamaños reales son 122.735 y 52.605 (70/30). La tarjeta principal del repositorio ya está corregida y trae la fe de erratas; los modelos, sus hashes y los SHA no cambian. `evidencias/auditoria.json` se regeneró con la partición vigente.
 - Solo dos familias (lineal y árboles potenciados); sin garantía de que XGBoost sea el mejor modelo posible. La búsqueda de C4 podó 16 de 25 pruebas.
 
 ## 7. Uso de IA, código externo y contribuciones

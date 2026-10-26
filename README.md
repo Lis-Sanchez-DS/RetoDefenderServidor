@@ -69,7 +69,7 @@ Validación (52.605 filas; ataque = clase positiva):
 Prueba (evaluación única de v2 sobre las 82,332 filas, umbral 0.66): recall 0.965, precisión 0.860, FPR 0.193, macro-F1 0.891. La precisión baja mucho frente a la validación; ver el informe y la tarjeta del modelo.
 
 ## Estructura
-`src/` código · `configs/` hiperparámetros de Optuna · `docs/` hipótesis y documentación de datos · `evidencias/` auditoría, experimentos, selección, métricas y predicciones de prueba, exportación de MLflow y prueba de recuperación · `tests/` pruebas (`.venv/bin/python -m pytest -q`) · `*.dvc` punteros de DVC.
+`src/` código · `configs/` hiperparámetros de Optuna · `docs/` hipótesis y documentación de datos · `evidencias/` auditoría, experimentos, selección, métricas y predicciones de prueba, exportación de MLflow y prueba de recuperación · `informe/` informe PDF y el script que lo genera desde `evidencias/` · `tests/` pruebas (`.venv/bin/python -m pytest -q`) · `*.dvc` punteros de DVC.
 
 ## Limitaciones
 Benchmark histórico; la validación estima rendimiento en distribución (filas parecidas a ambos lados); 10,4 % de las filas de prueba tienen una entrada idéntica en entrenamiento; la mejora de v2 frente a v1 proviene del umbral, no de los hiperparámetros; Fuzzers se detectan peor (recall 0,77 en prueba).
