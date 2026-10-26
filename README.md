@@ -17,7 +17,7 @@ Modelos: https://huggingface.co/LisSanchez-DS/defender-servidor (repositorio pú
 ## Instalación
 ```bash
 git clone https://github.com/Lis-Sanchez-DS/RetoDefenderServidor.git && cd RetoDefenderServidor
-python3 -m venv .venv
+python3.14 -m venv .venv      # o `python3`, si ya es 3.14
 .venv/bin/pip install -r requirements.lock.txt
 ```
 Para el código de una versión concreta: `git checkout v1` o `git checkout v2` (etiquetas anotadas).
@@ -39,6 +39,8 @@ unzip respaldo-dvc.zip                                   # crea la carpeta respa
 .venv/bin/dvc remote modify --local almacen secret_access_key <SECRETO>
 .venv/bin/dvc pull
 ```
+
+Las dos versiones de datos que pide el taller (originales y preparados) tienen etiqueta de Git (`datos-originales`, `datos-preparados`) y su transformación está documentada en [`docs/transformacion_datos.md`](docs/transformacion_datos.md).
 
 Comprobación de huellas (deben coincidir con `evidencias/auditoria.json` y con el anexo del taller):
 ```bash
@@ -67,20 +69,20 @@ Descarga manual por SHA completo:
 from huggingface_hub import hf_hub_download
 ruta = hf_hub_download("LisSanchez-DS/defender-servidor", "model.joblib", revision="053f3e62f144e78e055533f82bce14c9b54e3030")  # v1
 ```
-La prueba de recuperación completa (entorno nuevo, `dvc pull`, v1 y v2 por SHA, 50 filas fijas) está en `evidencias/recuperacion/` (`recuperar.sh`, `log.txt`, `resultado.json`).
+La prueba de recuperación completa (entorno nuevo, `dvc pull`, v1 y v2 por SHA, 50 filas fijas) está en `evidencias/recuperacion/` (`recuperar.sh`, `log.txt`, `resultado.json`; la primera prueba, hecha con el bucket R2, se conserva como `log_prueba_inicial_r2.txt`).
 
 ## Resultados
 Validación (52.605 filas; ataque = clase positiva):
 
 | Config | Familia | Umbral | Recall | Precisión | FPR | Macro-F1 | Run MLflow |
 |---|---|---|---|---|---|---|---|
-| C0 | linea-base | 0.5 | 1.0000 | 0.6806 | 1.0000 | 0.4050 | `6ae04f9efb8e47d0908f8f9bfa03a381` |
-| C1 | regresion-logistica | 0.5 | 0.9876 | 0.9217 | 0.1789 | 0.9212 | `c3deb2a3e927442fa4f209f7d7770838` |
-| C2 | arboles-xgboost | 0.5 | 0.9748 | 0.9608 | 0.0847 | 0.9487 | `18fbcc33e83041e7ad99c7937583159d` |
-| C3 | arboles-xgboost | 0.5 | 0.9727 | 0.9613 | 0.0834 | 0.9476 | `7ca31411665944ea8e7d9927e8b752ba` |
-| C4 | arboles-xgboost | 0.660669 | 0.9537 | 0.9738 | 0.0547 | 0.9443 | `6d7cb635a3104e838d81b205f2d51b49` |
+| C0 | linea-base | 0,5 | 1,0000 | 0,6806 | 1,0000 | 0,4050 | `6ae04f9efb8e47d0908f8f9bfa03a381` |
+| C1 | regresion-logistica | 0,5 | 0,9876 | 0,9217 | 0,1789 | 0,9212 | `c3deb2a3e927442fa4f209f7d7770838` |
+| C2 | arboles-xgboost | 0,5 | 0,9748 | 0,9608 | 0,0847 | 0,9487 | `18fbcc33e83041e7ad99c7937583159d` |
+| C3 | arboles-xgboost | 0,5 | 0,9727 | 0,9613 | 0,0834 | 0,9476 | `7ca31411665944ea8e7d9927e8b752ba` |
+| C4 | arboles-xgboost | 0,6607 | 0,9537 | 0,9738 | 0,0547 | 0,9443 | `6d7cb635a3104e838d81b205f2d51b49` |
 
-Prueba (evaluación única de v2 sobre las 82,332 filas, umbral 0.66): recall 0.965, precisión 0.860, FPR 0.193, macro-F1 0.891. La precisión baja mucho frente a la validación; ver el informe y la tarjeta del modelo.
+Prueba (evaluación única de v2 sobre las 82.332 filas, umbral 0,66): recall 0,965, precisión 0,860, FPR 0,193, macro-F1 0,891. La precisión baja mucho frente a la validación; ver el informe y la tarjeta del modelo.
 
 ## Estructura
 `src/` código · `configs/` hiperparámetros de Optuna · `docs/` hipótesis y documentación de datos · `evidencias/` auditoría, experimentos, selección, métricas y predicciones de prueba, exportación de MLflow y prueba de recuperación · `informe/` informe PDF y el script que lo genera desde `evidencias/` · `tests/` pruebas (`.venv/bin/python -m pytest -q`) · `*.dvc` punteros de DVC.

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Prueba de recuperación en una carpeta y un entorno nuevos (sin cachés de datos, modelos ni pip).
-# Uso:  bash recuperar.sh <carpeta_nueva_vacía> <url_o_ruta_del_repositorio> <commit>
-# (El repositorio de Hugging Face es público: no hace falta token. Durante la prueba original era privado y se usó HF_TOKEN.)
-# Antes: copiar las credenciales de lectura del remoto DVC a <carpeta>/proyecto/.dvc/config.local (no van a Git);
-#        con el script: DVC_CONFIG_LOCAL=<ruta del config.local>.
+# Uso:  DVC_RESPALDO=<carpeta respaldo-dvc descomprimida> bash recuperar.sh <carpeta_nueva_vacía> <url_o_ruta_del_repositorio> <commit>
+#       (sin credenciales: el almacenamiento DVC viene del archivo respaldo-dvc.zip y los modelos del repositorio público de Hugging Face)
+# Variante original (primera prueba, ver log_prueba_inicial_r2.txt): bucket R2 con DVC_CONFIG_LOCAL=<ruta del config.local>
+#       (no va a Git) y un repositorio de Hugging Face aún privado (HF_TOKEN). Ya no hacen falta.
 set -euo pipefail
 DEST=${1:?carpeta nueva}; REPO=${2:?repositorio}; COMMIT=${3:?commit}
 ANEXO_TRAIN=bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa
@@ -14,13 +14,17 @@ git clone -q "$REPO" "$DEST/proyecto"; cd "$DEST/proyecto"; git checkout -q "$CO
 echo "== 2. Entorno nuevo con dependencias fijadas"; python3 --version
 python3 -m venv .venv; .venv/bin/pip install -q --no-cache-dir -r requirements.lock.txt; .venv/bin/pip check | tail -1
 echo "== 3. Datos con DVC desde el remoto (caché nueva)"
-cp "${DVC_CONFIG_LOCAL:?ruta a config.local}" .dvc/config.local
+if [ -n "${DVC_RESPALDO:-}" ]; then
+  .venv/bin/dvc remote add --local respaldo "$DVC_RESPALDO" >/dev/null; REMOTO="-r respaldo"; echo "remoto: respaldo local ($DVC_RESPALDO)"
+else
+  cp "${DVC_CONFIG_LOCAL:?ruta a config.local}" .dvc/config.local; REMOTO=""; echo "remoto: bucket R2 (almacen)"
+fi
 test ! -e .dvc/cache || echo "caché preexistente: $(ls .dvc/cache)"
 RAW=data/raw/unsw-nb15
-.venv/bin/dvc pull $RAW/particion_oficial/UNSW_NB15_training-set.csv.dvc $RAW/particion_oficial/UNSW_NB15_testing-set.csv.dvc \
+.venv/bin/dvc pull $REMOTO $RAW/particion_oficial/UNSW_NB15_training-set.csv.dvc $RAW/particion_oficial/UNSW_NB15_testing-set.csv.dvc \
   $RAW/metadatos/NUSW-NB15_features.csv.dvc data/processed/particion_entrenamiento_validacion.csv.dvc \
   data/processed/validacion_taller-C2.csv.dvc data/processed/validacion_taller-C4.csv.dvc
-.venv/bin/dvc status
+.venv/bin/dvc status $REMOTO
 echo "== 4. Huellas de los datos originales frente al anexo del taller"
 sha256sum $RAW/particion_oficial/*.csv
 [ "$(sha256sum $RAW/particion_oficial/UNSW_NB15_training-set.csv | cut -d' ' -f1)" = "$ANEXO_TRAIN" ] && echo "training: coincide con el anexo"

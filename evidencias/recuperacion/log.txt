@@ -1,10 +1,11 @@
 == 1. Código: clonar y fijar la revisión
-Sun Oct 25 23:43:49 UTC 2026
-48047163b023e68728aa1594929775871ec0da1e
+Mon Oct 26 01:06:32 UTC 2026
+fcb0664fb66b1b825a309fbd0cf300d8207e496f
 == 2. Entorno nuevo con dependencias fijadas
 Python 3.14.4
 No broken requirements found.
 == 3. Datos con DVC desde el remoto (caché nueva)
+remoto: respaldo local (/tmp/claude-1000/-home-lis-code-RetoDefenderServidor/8f420287-fdd8-4f29-b24f-3cbb3e916725/scratchpad/respaldo_extraido/respaldo-dvc)
 A       data/processed/particion_entrenamiento_validacion.csv
 A       data/processed/validacion_taller-C2.csv
 A       data/processed/validacion_taller-C4.csv
@@ -12,7 +13,14 @@ A       data/raw/unsw-nb15/metadatos/NUSW-NB15_features.csv
 A       data/raw/unsw-nb15/particion_oficial/UNSW_NB15_testing-set.csv
 A       data/raw/unsw-nb15/particion_oficial/UNSW_NB15_training-set.csv
 6 files fetched and 6 files added
-Data and pipelines are up to date.
+deleted:            models/taller-C2.joblib
+deleted:            data/processed/validacion_taller-C1.csv
+deleted:            models/taller-C4.joblib
+deleted:            models/taller-C0.joblib
+deleted:            data/processed/validacion_taller-C3.csv
+deleted:            models/taller-C1.joblib
+deleted:            models/taller-C3.joblib
+deleted:            data/processed/validacion_taller-C0.csv
 == 4. Huellas de los datos originales frente al anexo del taller
 734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559  data/raw/unsw-nb15/particion_oficial/UNSW_NB15_testing-set.csv
 bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa  data/raw/unsw-nb15/particion_oficial/UNSW_NB15_training-set.csv
@@ -28,4 +36,4 @@ v1 predicciones idénticas: True | diferencia máxima de probabilidad: 0.0 | OK
 v2 predicciones idénticas: True | diferencia máxima de probabilidad: 0.0 | OK
 prueba de recuperación: APROBADA
 == fin
-Sun Oct 25 23:49:05 UTC 2026
+Mon Oct 26 01:10:02 UTC 2026
