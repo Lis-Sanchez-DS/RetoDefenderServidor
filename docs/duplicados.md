@@ -1,5 +1,7 @@
 # Filas duplicadas: problema, intentos de solución y decisión
 
+> **Nota (taller evaluable).** Este análisis nació con la guía anterior, que usaba validación cruzada de 5 pliegues. Se conserva porque el problema de los duplicados y la decisión de agrupar por vector idéntico siguen vigentes. La partición del taller es una sola, 70/30, construida con el mismo principio (`StratifiedGroupKFold`, grupo = vector de entrada idéntico, semilla 42; ver `docs/transformacion_datos.md`). Las cifras de este documento corresponden al archivo de entrenamiento completo, no a la partición.
+
 ## El problema
 En el entrenamiento oficial (175.340 filas tras excluir 1 fila con estado raro), 74.301 filas (42,4 %) son copias exactas de otra fila en las 42 variables de entrada (101.039 vectores distintos). Se concentran en los ataques: son copia el 58,8 % de las filas de ataque frente al 7,5 % de las normales (Generic 90 %, DoS 76 %, Analysis 73 %, Backdoor 71 %, Exploits 44 %). Los grupos más grandes (hasta 415 filas) son sondeos de un solo paquete (conexiones de duración casi nula y sin respuesta), que son idénticos porque no hay nada más que los distinga. Además, 229 grupos (940 filas) tienen vectores idénticos con etiquetas distintas: error imposible de evitar.
 

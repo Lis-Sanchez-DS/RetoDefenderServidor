@@ -9,7 +9,7 @@
 
 ## 2. Versiones
 ### v1 — C2
-- Commit del código (tag `v1`): `f40c9cc` — https://github.com/Lis-Sanchez-DS/RetoDefenderServidor/tree/v1
+- Código: el modelo se entrenó en el commit `4c3fb7c` (el que registró MLflow); la etiqueta `v1` apunta a `f40c9cc`, que ya incluye el puntero DVC del modelo y la evidencia — https://github.com/Lis-Sanchez-DS/RetoDefenderServidor/tree/v1
 - Referencia DVC: datos originales (training) md5 `e55caabaa6cd4a8f1c06a227bcfababc`; datos preparados (partición) md5 `a869e919c9a8a014fa6c7aec00446ce5`; puntero del modelo `models/taller-C2.joblib.dvc`
 - Run de MLflow: `18fbcc33e83041e7ad99c7937583159d` (exportado en `evidencias/mlflow/18fbcc33e83041e7ad99c7937583159d.json`)
 - Hugging Face: https://huggingface.co/LisSanchez-DS/defender-servidor · revisión `053f3e62f144e78e055533f82bce14c9b54e3030` (tag `v1`)
@@ -17,7 +17,7 @@
 - Umbral: **0.5** · métricas de validación: recall 0.9748, precisión 0.9608, FPR 0.0847, macro-F1 0.9487
 
 ### v2 — C4
-- Commit del código (tag `v2`): `f235480` — https://github.com/Lis-Sanchez-DS/RetoDefenderServidor/tree/v2
+- Código: el modelo se entrenó en el commit `f235480` (el que registró MLflow), al que apunta la etiqueta `v2` — https://github.com/Lis-Sanchez-DS/RetoDefenderServidor/tree/v2
 - Referencia DVC: datos originales (training) md5 `e55caabaa6cd4a8f1c06a227bcfababc`; datos preparados (partición) md5 `a869e919c9a8a014fa6c7aec00446ce5`; puntero del modelo `models/taller-C4.joblib.dvc`
 - Run de MLflow: `6d7cb635a3104e838d81b205f2d51b49` (exportado en `evidencias/mlflow/6d7cb635a3104e838d81b205f2d51b49.json`)
 - Hugging Face: https://huggingface.co/LisSanchez-DS/defender-servidor · revisión `c521d5ccf41ad404998e3364c685363ffa620bbb` (tag `v2`)
@@ -26,6 +26,8 @@
 
 **Qué cambia entre v1 y v2:** los hiperparámetros del XGBoost (búsqueda de Optuna solo con entrenamiento) y el umbral (0,5 → 0,66). Con umbral 0,5 el modelo de v2 no supera a v1; la mejora en precisión (0,9608 → 0,9738) y en falsas alarmas (1.423 → 920) proviene del umbral, a costa de más ataques perdidos (903 → 1.656).
 **Selección congelada antes de la prueba:** commit `4fda613` (`evidencias/seleccion.json`); la prueba se evaluó después (commit `ea7cc48`). Verificable con `git log -- evidencias/seleccion.json evidencias/metricas-test.json`.
+
+**Versiones de datos en DVC** (referencias de Git, documentadas en `docs/transformacion_datos.md`): datos originales = etiqueta `datos-originales` (commit `7e1b3ac`); datos preparados (partición 70/30) = etiqueta `datos-preparados` (commit `6f6399e`).
 
 ## 3. Evidencias (carpeta `evidencias/`)
 | Archivo | Contenido |

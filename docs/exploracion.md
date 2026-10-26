@@ -5,8 +5,8 @@ Hallazgos del 5 de octubre de 2026, sobre `UNSW_NB15_training-set.csv` y `UNSW_N
 - Tamaño: 175.341 filas de entrenamiento y 82.332 de prueba; 45 columnas cada uno. No hay valores nulos.
 - Balance de clases (`label`): entrenamiento 68,1 % ataque / 31,9 % normal; prueba 55,1 % ataque / 44,9 % normal. La proporción cambia entre particiones.
 - Familias (`attack_cat`): muy desbalanceadas (Worms: 130 en entrenamiento y 44 en prueba; Generic: 40.000 en entrenamiento).
-- Repeticiones: 74.301 filas de entrenamiento (42 %) y 28.386 de prueba (34 %) son duplicados exactos en las variables de entrada. Además, 10.279 filas de entrenamiento aparecen también en prueba. Esto puede inflar las métricas y hay que decidir cómo tratarlo.
+- Repeticiones: 74.301 filas de entrenamiento (42 %) y 28.386 de prueba (34 %) son duplicados exactos en las variables de entrada. Además, 10.279 filas de entrenamiento aparecen también en prueba. Esto puede inflar las métricas. Política vigente: los duplicados no se eliminan y cada grupo de entradas idénticas va entero a entrenamiento o a validación (`docs/transformacion_datos.md`); el solapamiento con la prueba se mide en `evidencias/auditoria.json`.
 - Identificador: `id` va de 1 a N en cada archivo y solo refleja el orden del archivo; no debe usarse como variable.
 - Variables de respuesta: `label` y `attack_cat` (consistentes entre sí) no deben entrar como entradas.
 - Categóricas: `proto` (133 valores), `service` (13; 53,7 % es "-"), `state` (9). En prueba aparecen estados (`ACC`, `CLO`) que no están en entrenamiento.
-- La partición oficial no tiene conjunto de validación: hay que crearlo desde el entrenamiento.
+- La partición oficial no tiene conjunto de validación: se crea desde el entrenamiento (partición 70/30, `docs/transformacion_datos.md`).

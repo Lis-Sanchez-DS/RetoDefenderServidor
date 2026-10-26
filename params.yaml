@@ -1,15 +1,7 @@
-# Configuración central; se completa a medida que se toman decisiones.
-seed: 42
+# Configuración central del taller evaluable.
+seed: 42                 # semilla de la partición y de todos los modelos
 data:
   dataset: UNSW-NB15
-  version: TBD   # documentar fuente y versión una vez descargado
+  fuente: https://research.unsw.edu.au/projects/unsw-nb15-dataset   # ver docs/datos.md
 split:
-  test_size: 0.2
-  val_size: 0.3
-pipeline:
-  piso_recall: 0.95        # recall mínimo exigido en cada pliegue (ver docs/decisiones.md)
-  umbral: 0.6              # umbral congelado (experimento 6)
-  n_pliegues: 5
-  prefijo_modelos: pipeline  # nombres propios: no pisan los modelos congelados de los experimentos
-  modelo_registrado: defender-servidor
-  parametros_optuna: reports/optuna_mejores_parametros.json
+  val_size: 0.3          # validación = 30 % del archivo de entrenamiento (la prueba es el archivo de prueba oficial)

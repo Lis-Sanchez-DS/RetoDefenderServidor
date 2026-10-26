@@ -56,9 +56,19 @@
       "revision_sha": "c521d5ccf41ad404998e3364c685363ffa620bbb",
       "tag": "v2",
       "commit_tarjeta_con_resultado_de_prueba": "0e23c9a93e7eb63d409046110979edc34653c3ab",
-      "commit_fe_de_erratas_tarjeta": "ffa7219da202a3ece1c891792891871bcc2bba32"
+      "commit_fe_de_erratas_tarjeta": "ffa7219da202a3ece1c891792891871bcc2bba32",
+      "commit_instrucciones_de_uso": "994a464b26023f390ebc075022699d49b33510c8"
     }
   },
   "modelo_para_test": "v2",
-  "razon_modelo_para_test": "v2 es la solución final; v1 no se evalúa en la prueba (la comparación v1/v2 es en validación)"
+  "razon_modelo_para_test": "v2 es la solución final; v1 no se evalúa en la prueba (la comparación v1/v2 es en validación)",
+  "referencias_de_congelacion": {
+    "nota": "campo añadido después del congelamiento, solo para citar los commits; no modifica ningún campo congelado",
+    "commit_de_congelacion": "4fda61336d0af059a3b8c492be43ef2e4b1560b2",
+    "commit_de_evaluacion_en_prueba": "ea7cc48a67ff6c59ce7b786643023c3cc1fd80d2",
+    "etiquetas_git_datos": {
+      "datos-originales": "7e1b3ac",
+      "datos-preparados": "6f6399e"
+    }
+  }
 }
