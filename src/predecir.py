@@ -3,7 +3,7 @@
 Las revisiones salen de evidencias/seleccion.json. Se comprueba el hash del modelo y se usa el umbral
 publicado. La entrada puede tener las columnas originales de UNSW-NB15 (se ignoran id, label y attack_cat).
 Salida: row_id, score_attack (probabilidad de ataque) y y_pred (1 = ataque si score_attack >= umbral).
-Si el repositorio es privado hace falta iniciar sesión (`hf auth login`) o definir HF_TOKEN.
+El repositorio de Hugging Face es público: no hace falta iniciar sesión.
 Uso: .venv/bin/python -m src.predecir {v1|v2} entrada.csv salida.csv
 """
 import hashlib

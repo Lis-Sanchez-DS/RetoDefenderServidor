@@ -1,12 +1,11 @@
 # Entrega — MLOps · Defiende el servidor
 
-> Los campos marcados **COMPLETAR** están pendientes antes de enviar.
 
 ## 1. Integrantes y repositorio
 - Integrante (entrega individual): **Lis Alejandra Sánchez Moreno** — Grupo B (4:00 p. m. – 6:00 p. m.)
 - Repositorio de código: https://github.com/Lis-Sanchez-DS/RetoDefenderServidor (público)
 - Commit final de la entrega: se indica en el mensaje de entrega (un commit no puede contener su propio hash). Las versiones se identifican con las etiquetas `v1` y `v2`.
-- Repositorio de modelos: https://huggingface.co/LisSanchez-DS/defender-servidor (privado; acceso de lectura para el docente: **COMPLETAR** al invitar a su usuario)
+- Repositorio de modelos: https://huggingface.co/LisSanchez-DS/defender-servidor (público: se descarga sin iniciar sesión ni usar tokens)
 
 ## 2. Versiones
 ### v1 — C2
@@ -42,7 +41,9 @@
 | `recuperacion/` | 50 filas fijas de validación, salidas de v1/v2 antes y después, hashes, comandos (`recuperar.sh`), log y `resultado.json` (**APROBADA**, diferencia máxima de probabilidad 0.0) |
 
 ## 4. Almacenamiento DVC
-Remoto `almacen`: bucket privado `pipeline-mlops` en Cloudflare R2 (endpoint en `.dvc/config`). Contiene los datos originales (`UNSW_NB15_training-set.csv`, `UNSW_NB15_testing-set.csv`), los datos preparados (`particion_entrenamiento_validacion.csv`, puntuaciones de validación) y los modelos de trabajo. **Acceso:** credenciales de solo lectura entregadas por un canal seguro (no están en el repositorio ni en el ZIP): **COMPLETAR** la forma de entrega. Alternativa: archivo de respaldo del almacenamiento DVC compartido aparte del ZIP.
+Hay dos vías, sin compartir credenciales en el ZIP ni en el informe (el taller pide no compartir tokens):
+- **Respaldo del almacenamiento DVC** (`respaldo-dvc.zip`, 17 MB), entregado **aparte del ZIP de código**: contiene los 14 archivos versionados (datos originales de entrenamiento y prueba, metadatos, partición preparada, puntuaciones de validación y los 5 modelos de trabajo). Se usa como remoto local: `unzip respaldo-dvc.zip`, `dvc remote add --local respaldo ./respaldo-dvc`, `dvc pull -r respaldo` (instrucciones completas en el README). Probado desde un clon limpio de GitHub, sin credenciales: las huellas coinciden con las del anexo.
+- **Bucket privado `pipeline-mlops` en Cloudflare R2** (remoto `almacen`, endpoint en `.dvc/config`): es el almacenamiento original; el acceso requiere credenciales de la autora y no se comparte con el docente.
 
 ## 5. Comandos y recursos
 Instalación, recuperación de datos, entrenamiento y predicción: ver `README.md`. Recursos medidos (equipo de desarrollo: WSL2, 16 núcleos, 7,6 GB de RAM): búsqueda de Optuna C3 ≈ 35 min y C4 ≈ 15 min (25 pruebas cada una); prueba de recuperación completa en entorno nuevo ≈ 5 min (23:43:49–23:49:05 UTC del 25-oct-2026, incluye instalar dependencias y `dvc pull`). El entrenamiento de un modelo final no se midió por separado.

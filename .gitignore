@@ -13,14 +13,9 @@ mlartifacts/
 mlflow.db
 .prefect/
 
-# Datos y modelos los versiona DVC, no Git (DVC agrega sus propias reglas)
-/data/**/*.csv
-/data/processed/*
-/models/*
-!/data/processed/.gitkeep
-!/data/processed/*.dvc
-!/models/.gitkeep
-!/models/*.dvc
+
+# Los datos y modelos los versiona DVC; sus archivos se ignoran en .gitignore de cada carpeta (models/, data/processed/, data/raw/).
+# No usar patrones globales con excepciones para los .dvc: DVC dejaba de ver los punteros y `dvc pull` sin argumentos no los recuperaba.
 
 # Configuración local de Claude Code (no se publica)
 .claude/

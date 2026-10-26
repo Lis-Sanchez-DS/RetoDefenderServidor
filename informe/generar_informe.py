@@ -205,7 +205,7 @@ def construir():
 
     P = lambda t, s=base: Paragraph(t, s)
     H = []
-    H += [P("Código: github.com/Lis-Sanchez-DS/RetoDefenderServidor (público) · Modelos: huggingface.co/LisSanchez-DS/defender-servidor (privado, acceso de lectura para el docente)", sub)]
+    H += [P("Código: github.com/Lis-Sanchez-DS/RetoDefenderServidor (público) · Modelos: huggingface.co/LisSanchez-DS/defender-servidor (público)", sub)]
 
     # 1. Datos
     H += [P("1. Datos y limpieza", h1),

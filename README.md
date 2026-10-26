@@ -9,7 +9,7 @@ Cadena de trazabilidad: **commit Git → datos (DVC) → run de MLflow → revis
 | v1 | XGBoost estándar (C2), umbral 0,5 | `v1` | `18fbcc33e83041e7ad99c7937583159d` | `053f3e62f144e78e055533f82bce14c9b54e3030` |
 | v2 | XGBoost con búsqueda de Optuna (C4), umbral 0,66 | `v2` | `6d7cb635a3104e838d81b205f2d51b49` | `c521d5ccf41ad404998e3364c685363ffa620bbb` |
 
-Modelos: https://huggingface.co/LisSanchez-DS/defender-servidor (repositorio privado; se necesita acceso de lectura).
+Modelos: https://huggingface.co/LisSanchez-DS/defender-servidor (repositorio público: se descarga sin iniciar sesión).
 
 ## Requisitos
 - Python **3.14** (probado con 3.14.4), Linux/WSL, `git`. Dependencias fijadas en [`requirements.lock.txt`](requirements.lock.txt) (`requirements.txt` lista las directas).
@@ -23,14 +23,27 @@ python3 -m venv .venv
 Para el código de una versión concreta: `git checkout v1` o `git checkout v2` (etiquetas anotadas).
 
 ## Recuperar los datos con DVC
-Los datos y los modelos de trabajo no están en Git: los guarda DVC en un bucket privado de Cloudflare R2 (`.dvc/config`). Las credenciales de lectura **no** están en el repositorio; se entregan por separado y se guardan en el archivo local ignorado por Git:
+Los datos y los modelos de trabajo no están en Git: los versiona DVC (un `.dvc` por archivo). Hay dos formas de recuperarlos y las dos dejan los mismos archivos (se comprueban sus huellas).
+
+**A. Sin credenciales: archivo de respaldo del almacenamiento DVC** (`respaldo-dvc.zip`, 17 MB, se entrega aparte del ZIP de código). Se usa como un remoto local:
+```bash
+unzip respaldo-dvc.zip                                   # crea la carpeta respaldo-dvc/
+.venv/bin/dvc remote add --local respaldo ./respaldo-dvc
+.venv/bin/dvc pull -r respaldo
+.venv/bin/dvc status -r respaldo                         # debe decir que todo está sincronizado
+```
+
+**B. Con el bucket privado de Cloudflare R2** (remoto `almacen`, en `.dvc/config`). Requiere credenciales de lectura del dueño del bucket; se guardan en un archivo local que Git ignora:
 ```bash
 .venv/bin/dvc remote modify --local almacen access_key_id <ID>
 .venv/bin/dvc remote modify --local almacen secret_access_key <SECRETO>
-RAW=data/raw/unsw-nb15
-.venv/bin/dvc pull $RAW/particion_oficial/UNSW_NB15_training-set.csv.dvc $RAW/particion_oficial/UNSW_NB15_testing-set.csv.dvc \
-  data/processed/particion_entrenamiento_validacion.csv.dvc data/processed/validacion_taller-C2.csv.dvc data/processed/validacion_taller-C4.csv.dvc
-sha256sum $RAW/particion_oficial/*.csv   # deben coincidir con evidencias/auditoria.json y con el anexo del taller
+.venv/bin/dvc pull
+```
+
+Comprobación de huellas (deben coincidir con `evidencias/auditoria.json` y con el anexo del taller):
+```bash
+sha256sum data/raw/unsw-nb15/particion_oficial/*.csv
+# training bec7dd5e...e0648fa, testing 734fe664...c559 (valores completos en evidencias/auditoria.json)
 ```
 
 ## Ejecutar un experimento
@@ -43,7 +56,7 @@ Requiere los datos del paso anterior. Cada configuración (C0 línea base, C1 re
 Las búsquedas de Optuna (C3: ~35 min, C4: ~15 min en 16 núcleos): `python -m src.optuna_taller` y `python -m src.optuna_taller --umbral`. Las hipótesis (escritas antes de entrenar) están en [`docs/taller_hipotesis.md`](docs/taller_hipotesis.md).
 
 ## Descargar cada modelo y predecir
-Hace falta acceso de lectura al repositorio de Hugging Face (`.venv/bin/hf auth login` o `export HF_TOKEN=<token de lectura>`). Las revisiones salen de `evidencias/seleccion.json`; el script verifica el hash del modelo y aplica el umbral publicado:
+El repositorio de Hugging Face es público, así que no hace falta iniciar sesión ni usar ningún token. Las revisiones salen de `evidencias/seleccion.json`; el script verifica el hash del modelo y aplica el umbral publicado:
 ```bash
 .venv/bin/python -m src.predecir v1 evidencias/recuperacion/entrada_validacion.csv salida_v1.csv
 .venv/bin/python -m src.predecir v2 evidencias/recuperacion/entrada_validacion.csv salida_v2.csv
