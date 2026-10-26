@@ -100,15 +100,17 @@ def curva(y, prob):
 
 
 def main():
-    seed = yaml.safe_load(open("params.yaml"))["seed"]
-    entrenamiento, validacion = cargar_particion()
-    X_tr, y_tr = separar_xy(entrenamiento)
-    X_val, y_val = separar_xy(validacion)
     oficial = "--oficial" in sys.argv
     elegidos = [a for a in sys.argv[1:] if not a.startswith("--")]
     cfgs = configuraciones()
     if not elegidos or any(c not in cfgs for c in elegidos):
         raise SystemExit(f"indica configuraciones válidas ({', '.join(cfgs)}); ver el modo de uso al inicio del archivo")
+    if not Path(SALIDA).exists() or not Path("data/raw/unsw-nb15/particion_oficial/UNSW_NB15_training-set.csv").exists():
+        raise SystemExit("faltan los datos: recupéralos con DVC (ver 'Recuperar los datos con DVC' en el README)")
+    seed = yaml.safe_load(open("params.yaml"))["seed"]
+    entrenamiento, validacion = cargar_particion()
+    X_tr, y_tr = separar_xy(entrenamiento)
+    X_val, y_val = separar_xy(validacion)
     if oficial:
         dir_modelos, dir_val, dir_curvas = Path("models"), Path("data/processed"), Path("evidencias/curvas")
     else:
