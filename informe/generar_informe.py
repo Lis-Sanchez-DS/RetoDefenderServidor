@@ -209,9 +209,9 @@ def construir():
 
     # 1. Datos
     H += [P("1. Datos y limpieza", h1),
-          P(f"Usamos las particiones publicadas de UNSW-NB15 (descarga manual de la página de UNSW el 5 de octubre de 2026). Sus SHA-256 coinciden con los del anexo del taller, y las filas y columnas "
-            f"coinciden con lo publicado ({n(tr['filas'])} y {n(te['filas'])} filas, {tr['columnas']} columnas). El objetivo es <i>label</i> (0 normal, 1 ataque, que es la clase positiva). "
-            f"Vemos como la mayoría de las filas son ataques y como hay muchísimas copias exactas de las entradas:"),
+          P(f"Usé las particiones publicadas de UNSW-NB15 (descarga manual de la página de UNSW el 5 de octubre de 2026). Sus SHA-256 coinciden con los del anexo del taller, y las filas y columnas "
+            f"coinciden con lo publicado ({n(tr['filas'])} y {n(te['filas'])} filas, {tr['columnas']} columnas). El objetivo es <i>label</i> (0 normal, 1 ataque), y el ataque es la clase positiva. "
+            f"Vemos cómo la mayoría de las filas son ataques (" + pct(tr['clases_label']['1'] / tr['filas']) + " en entrenamiento y " + pct(te['clases_label']['1'] / te['filas']) + " en la prueba) y cómo hay muchísimas copias exactas de las entradas:"),
           tabla([["Archivo", "Filas", "Ataques", "Copias de otra fila (por entradas)", "Grupos con etiquetas contradictorias"],
                  ["training-set", n(tr["filas"]), pct(tr["clases_label"]["1"] / tr["filas"]),
                   f"{n(tr['duplicados_por_entradas']['filas_copia_de_otra'])} ({pct(tr['duplicados_por_entradas']['filas_copia_de_otra'] / tr['filas'])})",
@@ -221,13 +221,13 @@ def construir():
                   f"{te['duplicados_por_entradas']['grupos_con_etiquetas_contradictorias']} ({n(te['duplicados_por_entradas']['filas_en_grupos_contradictorios'])} filas)"]],
                 [2.6, 1.8, 1.8, 5.8, 5.2]),
           Spacer(1, 3),
-          P(f"<b>Política de limpieza.</b> Las 42 variables de entrada excluyen <i>label</i>, <i>attack_cat</i> (revela la respuesta) e <i>id</i> (solo identifica filas, lo usamos para auditar y para el <i>row_id</i> de las predicciones). "
+          P(f"<b>Política de limpieza.</b> Las entradas son 42 variables: se excluyen <i>label</i>, <i>attack_cat</i> (revela la respuesta) e <i>id</i> (solo identifica filas, y lo uso para auditar y para el <i>row_id</i> de las predicciones). "
             f"No hay faltantes. Los duplicados no se eliminan: cada vector de entrada idéntico forma un grupo que va entero a entrenamiento o a validación, y los grupos contradictorios se conservan (son error irreducible). "
-            f"Se excluyó una fila de entrenamiento con un estado raro (<i>no</i>); en la prueba no se eliminó ninguna fila, y los estados que el entrenamiento no vio se codifican con ceros. "
+            f"Se excluyó una fila de entrenamiento con el estado raro «no»; en la prueba no se eliminó ninguna fila, y los estados que el entrenamiento no vio se codifican con ceros. "
             f"El preprocesamiento (estandarización, <i>one-hot</i> de <i>service</i> y <i>state</i>, y <i>proto</i> con una categoría para lo infrecuente) se ajusta solo con entrenamiento y viaja dentro del pipeline guardado."),
-          P(f"<b>Partición.</b> Creamos entrenamiento y validación solo desde el archivo de entrenamiento, con semilla {aud['particion']['semilla']}: {n(aud['particion']['filas']['entrenamiento'])} y {n(aud['particion']['filas']['validacion'])} filas (70/30), "
+          P(f"<b>Partición.</b> Creé entrenamiento y validación solo desde el archivo de entrenamiento, con semilla {aud['particion']['semilla']}: {n(aud['particion']['filas']['entrenamiento'])} y {n(aud['particion']['filas']['validacion'])} filas (70/30), "
             f"con {pct(aud['particion']['ataques_por_conjunto']['entrenamiento'], 2)} de ataques en ambas y {aud['particion']['grupos_repartidos_entre_entrenamiento_y_validacion']} grupos repartidos. Es la misma para todos los experimentos. "
-            f"De la prueba (que solo se usó al final) medimos el solapamiento: {n(aud['cruces_entre_particiones']['filas_test_con_vector_identico_en_entrenamiento_oficial'])} filas ({n(aud['cruces_entre_particiones']['porcentaje_test'], 1)} %) tienen una entrada idéntica en entrenamiento, "
+            f"De la prueba (que solo se usó al final) medí el solapamiento: {n(aud['cruces_entre_particiones']['filas_test_con_vector_identico_en_entrenamiento_oficial'])} filas ({n(aud['cruces_entre_particiones']['porcentaje_test'], 1)} %) tienen una entrada idéntica en entrenamiento, "
             f"así que sus cifras serán algo optimistas en esas filas.")]
 
     # 2. Experimentos
@@ -239,63 +239,63 @@ def construir():
                  ["C0", "Línea base (siempre ataque)", "Referencia", "0,5", n(exp.loc['C0'].recall, 3), n(exp.loc['C0'].precision, 3), n(exp.loc['C0'].fpr, 3), n(exp.loc['C0'].macro_f1, 3), "n/a"],
                  ["C1", "Regresión logística, numéricas y categóricas", "Supera con claridad a la línea base y deja de alarmar todo el tráfico normal", "0,5", n(exp.loc['C1'].recall, 3), n(exp.loc['C1'].precision, 3), n(exp.loc['C1'].fpr, 3), n(exp.loc['C1'].macro_f1, 3), "Se cumple"],
                  ["C2", "XGBoost estándar (300 árboles, prof. 6, tasa 0,1)", "Al enfocarse en la precisión, XGBoost supera a la regresión logística", "0,5", n(exp.loc['C2'].recall, 3), n(exp.loc['C2'].precision, 3), n(exp.loc['C2'].fpr, 3), n(exp.loc['C2'].macro_f1, 3), "Se cumple"],
-                 ["C3", "XGBoost con Optuna (25 pruebas, solo entrenamiento)", "Mantiene recall >= 0,95 y reduce de forma significativa los falsos positivos", "0,5", n(exp.loc['C3'].recall, 3), n(exp.loc['C3'].precision, 3), n(exp.loc['C3'].fpr, 3), n(exp.loc['C3'].macro_f1, 3), "En parte"],
+                 ["C3", "XGBoost con Optuna (25 pruebas, solo entrenamiento)", "Mantiene un recall de al menos 0,95 y reduce de forma significativa los falsos positivos", "0,5", n(exp.loc['C3'].recall, 3), n(exp.loc['C3'].precision, 3), n(exp.loc['C3'].fpr, 3), n(exp.loc['C3'].macro_f1, 3), "En parte"],
                  ["C4", "XGBoost con Optuna que busca también el umbral (25 pruebas)", "Con el mejor umbral balancea mejor FP y FN y logra mayor precisión", n(exp.loc['C4'].umbral, 4), n(exp.loc['C4'].recall, 3), n(exp.loc['C4'].precision, 3), n(exp.loc['C4'].fpr, 3), n(exp.loc['C4'].macro_f1, 3), "En parte"]],
                 [0.8, 3.5, 4.1, 1.5, 1.3, 1.2, 1.2, 1.5, 1.9]),
           Spacer(1, 3),
           P(f"<b>Interpretación.</b> Pasar de la regresión logística a XGBoost (C1 a C2) es el salto grande: las falsas alarmas bajan de {n(exp.loc['C1'].fp)} a {n(exp.loc['C2'].fp)} sobre {n(exp.loc['C2'].tn + exp.loc['C2'].fp)} filas normales, "
             f"aunque a 0,5 XGBoost pierde más ataques ({n(exp.loc['C2'].fn)} frente a {n(exp.loc['C1'].fn)}). Optuna a 0,5 (C3) casi no cambia nada frente a C2 (precisión {n(exp.loc['C3'].precision, 4)} contra {n(exp.loc['C2'].precision, 4)}, "
             f"{n(exp.loc['C3'].fp)} contra {n(exp.loc['C2'].fp)} falsas alarmas y {n(exp.loc['C3'].fn)} contra {n(exp.loc['C2'].fn)} ataques perdidos), por eso la hipótesis se cumple solo en parte. "
-            f"C4 sube la precisión a {n(exp.loc['C4'].precision, 4)} con un umbral de {n(exp.loc['C4'].umbral, 4)}, pero el recall baja a {n(exp.loc['C4'].recall, 4)}: balancea los errores en otra dirección (menos falsas alarmas, más ataques perdidos), y por eso también la marcamos como parcial. "
+            f"C4 sube la precisión a {n(exp.loc['C4'].precision, 4)} con un umbral de {n(exp.loc['C4'].umbral, 4)}, pero el recall baja a {n(exp.loc['C4'].recall, 4)}: balancea los errores en otra dirección (menos falsas alarmas, más ataques perdidos), y por eso también la califiqué como parcial. "
             f"La búsqueda de C4 podó 16 de 25 pruebas (9 completas), así que exploró poco; con otra semilla el resultado podría variar.")]
 
     # 3. v1 vs v2
     H += [P("3. Cambios entre v1 y v2", h1),
-          P(f"v1 es C2 (XGBoost estándar, umbral {n(v1['umbral'], 2)}) y v2 es C4 (XGBoost de la búsqueda de Optuna, umbral {n(v2['umbral'], 2)}, que es el 0,6607 hallado por la búsqueda y redondeado por mí). Se distinguen en los hiperparámetros y en el umbral, y sus archivos de modelo son distintos. "
-            f"Mi hipótesis era que Optuna lograría un mejor desempeño que el XGBoost base y se cumple en validación:"),
+          P(f"v1 es C2 (XGBoost estándar, umbral {n(v1['umbral'], 2)}) y v2 es C4 (XGBoost de la búsqueda de Optuna, con umbral {n(v2['umbral'], 2)}, que redondeé desde el 0,6607 que halló la búsqueda). Se distinguen en los hiperparámetros y en el umbral, y sus archivos de modelo son distintos. "
+            f"Mi hipótesis era que Optuna lograría un mejor desempeño que el XGBoost base, y se cumple en validación, aunque con un matiz que explico después de la tabla:"),
           tabla([["Validación (" + n(sel['v1']['metricas_validacion']['tn'] + sel['v1']['metricas_validacion']['fp'] + sel['v1']['metricas_validacion']['fn'] + sel['v1']['metricas_validacion']['tp']) + " filas)", "Precisión", "Recall", "FPR", "F1 macro", "Falsas alarmas (FP)", "Ataques perdidos (FN)"],
                  [f"v1 (C2, umbral {n(v1['umbral'], 2)})", n(m1['precision'], 4), n(m1['recall'], 4), n(m1['tasa_falsos_positivos'], 4), n(m1['macro_f1'], 4), n(m1['fp']), n(m1['fn'])],
                  [f"v2 (C4, umbral {n(v2['umbral'], 2)})", n(m2['precision'], 4), n(m2['recall'], 4), n(m2['tasa_falsos_positivos'], 4), n(m2['macro_f1'], 4), n(m2['fp']), n(m2['fn'])]],
                 [3.9, 1.9, 1.9, 1.9, 1.9, 3.0, 3.1]),
           Spacer(1, 3),
           P(f"<b>Qué mejora y qué empeora.</b> Mejoran la precisión (+{n(m2['precision'] - m1['precision'], 4)}) y las falsas alarmas ({n(m1['fp'])} a {n(m2['fp'])}). Empeoran el recall ({n(m1['recall'], 4)} a {n(m2['recall'], 4)}), el F1 macro y, sobre todo, los ataques perdidos ({n(m1['fn'])} a {n(m2['fn'])}). "
-            f"Aceptamos esa pérdida porque el recall se mantiene sobre el piso de 0,95, aunque reconozco que contradice un poco la prioridad de no perder ataques.")]
+            f"Acepté esa pérdida porque el recall se mantiene por encima del piso de 0,95, aunque reconozco que contradice un poco mi prioridad de no perder ataques.")]
     H += [recuadro(f"<b>Hallazgo importante.</b> La mejora viene del umbral, no de los hiperparámetros. Con umbral 0,5 el modelo de v2 da una precisión de {n(mlf['C4']['metricas']['val_precision'], 4)}, prácticamente igual que la de v1 ({n(m1['precision'], 4)}); y el modelo de v1 con su propio umbral de {n(p95_c2['val_p95_umbral'], 4)} (recall {n(p95_c2['val_p95_recall'], 4)}) "
             f"alcanza precisión {n(p95_c2['val_p95_precision'], 4)} con {n(p95_c2['val_p95_fp'])} falsas alarmas, algo mejor que v2. Es decir, la búsqueda de Optuna no aportó una ventaja medible aquí; la comparación v1/v2 se hizo en validación, como pide el taller.")]
 
     # 4. Umbral
     H += [P("4. Elección del umbral", h1),
-          P(f"El umbral de cada versión se eligió usando solo validación. Prioricé el recall (un ataque perdido cuesta más que una falsa alarma) con un piso de 0,95, y entre los umbrales que lo cumplen busqué la mayor precisión. "
+          P(f"El umbral de cada versión lo elegí usando solo validación. Prioricé el recall (un ataque perdido cuesta más que una falsa alarma) con un piso de 0,95, y entre los umbrales que lo cumplen busqué la mayor precisión. "
             f"La figura muestra el modelo de v2 en validación: al subir el umbral la precisión sube y el recall baja, y el recall cruza el piso de 0,95 en {n(mlf['C4']['metricas']['val_p95_umbral'], 3)}, de modo que 0,66 queda un poco antes del cruce, con algo de margen sobre el piso (recall {n(m2['recall'], 4)}). "
             f"v1 se deja en 0,5 (primera solución funcional, sin ajuste). La selección de v1 y v2 se congeló en el commit 4fda613, antes de que existieran las predicciones de la prueba."),
           Image(str(FIG), width=15.2 * cm, height=15.2 * cm * 2.5 / 7.2)]
 
     # 5. Test
     H += [P("5. Prueba final", h1),
-          P(f"Evaluamos una sola vez v2 (modelo de SHA-256 que coincide con el congelado) sobre las {n(tst['filas_evaluadas'])} filas de la prueba, sin eliminar ninguna, con umbral {n(tst['umbral'], 2)}. "
+          P(f"Evalué una sola vez v2 (su SHA-256 coincide con el del modelo congelado) sobre las {n(tst['filas_evaluadas'])} filas de la prueba, sin eliminar ninguna, con umbral {n(tst['umbral'], 2)}. "
             f"El archivo <i>predicciones-test.csv</i> tiene una fila por registro (<i>row_id</i>, <i>y_true</i>, <i>score_attack</i>, <i>y_pred</i>, con la regla y_pred = 1 si el puntaje es al menos el umbral) y las métricas se recalculan desde él (hay una prueba automática)."),
           tabla([["", "Recall", "Precisión", "FPR", "F1 macro", "TN", "FP", "FN", "TP"],
                  ["Validación", n(m2['recall'], 4), n(m2['precision'], 4), n(m2['tasa_falsos_positivos'], 4), n(m2['macro_f1'], 4), n(m2['tn']), n(m2['fp']), n(m2['fn']), n(m2['tp'])],
                  ["Prueba", n(mt['recall'], 4), n(mt['precision'], 4), n(mt['tasa_falsos_positivos'], 4), n(mt['macro_f1'], 4)] + [n(tst['matriz_confusion'][k]) for k in ('tn', 'fp', 'fn', 'tp')]],
                 [2.4, 1.8, 1.9, 1.8, 1.9, 1.9, 1.9, 1.9, 1.9]),
           Spacer(1, 3),
-          P(f"Vemos como el recall se sostiene ({n(mt['recall'], 3)}), pero la precisión cae unos {n(100 * (m2['precision'] - mt['precision']), 0)} puntos y la FPR se multiplica por {n(mt['tasa_falsos_positivos'] / m2['tasa_falsos_positivos'], 1)}: casi una de cada cinco filas normales se marca como ataque. "
+          P(f"Vemos cómo el recall se sostiene ({n(mt['recall'], 3)}), pero la precisión cae unos {n(100 * (m2['precision'] - mt['precision']), 0)} puntos y la FPR se multiplica por {n(mt['tasa_falsos_positivos'] / m2['tasa_falsos_positivos'], 1)}: casi una de cada cinco filas normales se marca como ataque. "
             f"Por familia, Fuzzers es la más débil (recall {n(tst['recall_por_familia_de_ataque']['Fuzzers'], 3)}) y Analysis le sigue ({n(tst['recall_por_familia_de_ataque']['Analysis'], 3)}); las demás están por encima de {n(np.floor(100 * min(v for k, v in tst['recall_por_familia_de_ataque'].items() if k not in ('Fuzzers', 'Analysis'))) / 100, 2)}. "
-            f"No demostramos la causa de la caída; una hipótesis (sin comprobar) es que la prueba incluye una sesión de captura ausente del entrenamiento. El resultado se conserva aunque empeore, como pide el taller.")]
+            f"No demostré la causa de la caída; una hipótesis (sin comprobar) es que la prueba incluye una sesión de captura ausente del entrenamiento. El resultado se conserva aunque empeore, como pide el taller.")]
 
     # 6. Limitaciones y trazabilidad
     H += [P("6. Limitaciones, trazabilidad y declaración de ayuda", h1),
           P("<b>Limitaciones.</b> (a) Es un benchmark histórico de laboratorio (2015) y no demuestra eficacia en una red actual. (b) La validación estima rendimiento en distribución, con filas parecidas a ambos lados, así que es optimista. "
-            "(c) Esta misma prueba ya se había mirado una vez, con otro modelo, en una versión anterior del trabajo (otra guía); no se usó para elegir el modelo ni el umbral actuales, pero conviene decirlo. "
-            "(d) Solo comparamos dos familias, y la mejora de v2 no depende de los hiperparámetros. (e) Las tarjetas inmutables de v1 y v2 en Hugging Face traen por error los tamaños de una partición 80/20 descartada; la tarjeta principal tiene una fe de erratas y los modelos no cambian."),
+            "(c) Este mismo conjunto de prueba ya se había evaluado una vez, con otro modelo, en una versión anterior del trabajo (con una guía previa del taller); no se usó para elegir el modelo ni el umbral actuales, pero conviene decirlo. "
+            "(d) Solo comparé dos familias, y la mejora de v2 no depende de los hiperparámetros. (e) Las tarjetas inmutables de v1 y v2 en Hugging Face traen por error los tamaños de una partición 80/20 descartada; la tarjeta principal tiene una fe de erratas y los modelos no cambian."),
           tabla([["", "Código (tag)", "Run MLflow", "Revisión de Hugging Face (SHA)", "SHA-256 del modelo"],
                  ["v1", "v1 (f40c9cc)", v1['run_id'], v1['huggingface']['revision_sha'], v1['modelo_sha256'][:24] + "…"],
                  ["v2", "v2 (f235480)", v2['run_id'], v2['huggingface']['revision_sha'], v2['modelo_sha256'][:24] + "…"]],
                 [0.9, 2.3, 4.5, 6.5, 3.4]),
           Spacer(1, 3),
-          P(f"<b>Recuperación.</b> En una carpeta y un entorno nuevos (dependencias fijadas, sin cachés), recuperamos con DVC los datos originales y preparados (huellas iguales a las del anexo) y descargamos v1 y v2 de Hugging Face por su SHA completo. "
-            f"Con {rec['filas']} filas fijas de validación, las predicciones coincidieron con las guardadas y la diferencia máxima de probabilidad fue {max(x['diferencia_maxima_en_probabilidad'] for x in rec['versiones'].values())} (tolerancia declarada {rec['tolerancia_probabilidades']:g}): {rec['resultado'].lower()}."),
-          P("<b>Uso de IA.</b> Usé Claude Code (Anthropic, modelo Claude Sonnet 5.5) para escribir y refactorizar el código y las pruebas, redactar la documentación y las tarjetas de modelo, ejecutar la prueba de recuperación y redactar este informe a partir de los archivos de <i>evidencias/</i> y de mi perfil de estilo de escritura. "
+          P(f"<b>Recuperación.</b> En una carpeta y un entorno nuevos (dependencias fijadas, sin cachés), recuperé con DVC los datos originales y preparados (huellas iguales a las del anexo) y descargué v1 y v2 de Hugging Face por su SHA completo. "
+            f"Con {rec['filas']} filas fijas de validación, las predicciones de ambas versiones coincidieron con las guardadas y la diferencia máxima de probabilidad fue {n(max(x['diferencia_maxima_en_probabilidad'] for x in rec['versiones'].values()), 1)} (tolerancia declarada: {f"{rec['tolerancia_probabilidades']:.0e}".replace('e-0', 'e-')}), así que la prueba quedó {rec['resultado'].lower()}."),
+          P("<b>Uso de IA.</b> Usé Claude Code (Anthropic, modelo Claude Sonnet 5.5) para escribir y refactorizar el código y las pruebas, redactar la documentación y las tarjetas de modelo, ejecutar la prueba de recuperación y redactar este informe a partir de los archivos de la carpeta de evidencias y de mi perfil de estilo de escritura. "
             "Las decisiones (partición, configuraciones, definición de v1 y v2, umbrales), todas las hipótesis y sus veredictos son míos. Revisé el informe y verifiqué sus cifras contra los archivos de evidencia (una prueba automática compara las cifras del PDF con ellos). Los detalles están en <i>entrega.md</i>.")]
 
     # Referencias (no cuentan para el límite)
