@@ -47,7 +47,7 @@
   },
   "etiquetas": {
     "mlflow.user": "lis",
-    "mlflow.source.name": "/home/lis/code/RetoDefenderServidor/src/taller_experimentos.py",
+    "mlflow.source.name": "./src/taller_experimentos.py",
     "mlflow.source.type": "LOCAL",
     "mlflow.source.git.commit": "f40c9cc4d4e485f62053848188ce1eb1165b315c",
     "mlflow.source.git.branch": "main",
@@ -65,6 +65,6 @@
     "dvc_md5_datos_originales_training": "e55caabaa6cd4a8f1c06a227bcfababc",
     "dvc_md5_datos_preparados_particion": "a869e919c9a8a014fa6c7aec00446ce5"
   },
-  "artefacto": "/home/lis/code/RetoDefenderServidor/mlruns/3/7ca31411665944ea8e7d9927e8b752ba/artifacts/modelo",
+  "artefacto": "./mlruns/3/7ca31411665944ea8e7d9927e8b752ba/artifacts/modelo",
   "modelo_sha256": "34a5f875c4600608065e3ee28bee92c6a67fea6d8a055051e574def7f85f49e6"
 }

@@ -12,6 +12,15 @@ import mlflow
 import pandas as pd
 
 
+def limpiar(valor):
+    """Quita rutas personales del equipo de desarrollo (la ruta del proyecto pasa a ser relativa)."""
+    if isinstance(valor, str):
+        return valor.replace(str(Path.cwd()), ".").replace(str(Path.home()), "~")
+    if isinstance(valor, dict):
+        return {k: limpiar(v) for k, v in valor.items()}
+    return valor
+
+
 def main():
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     conclusiones = json.load(open("evidencias/conclusiones_validacion.json"))
@@ -25,9 +34,9 @@ def main():
     filas = []
     for cid, r in sorted(ultimas.items()):
         d, m, t = r.data.params, r.data.metrics, r.data.tags
-        json.dump({"run_id": r.info.run_id, "run_name": r.info.run_name, "estado": r.info.status,
-                   "inicio_ms": r.info.start_time, "parametros": d, "metricas": m, "etiquetas": t,
-                   "artefacto": f"{r.info.artifact_uri}/modelo", "modelo_sha256": t.get("modelo_sha256")},
+        json.dump(limpiar({"run_id": r.info.run_id, "run_name": r.info.run_name, "estado": r.info.status,
+                           "inicio_ms": r.info.start_time, "parametros": d, "metricas": m, "etiquetas": t,
+                           "artefacto": f"{r.info.artifact_uri}/modelo", "modelo_sha256": t.get("modelo_sha256")}),
                   open(f"evidencias/mlflow/{r.info.run_id}.json", "w"), indent=2, ensure_ascii=False)
         propio = d.get("umbral_propio", "ninguno") != "ninguno"
         filas.append({"config_id": cid, "run_id": r.info.run_id, "hipotesis": t["hipotesis"], "familia": t["familia"],

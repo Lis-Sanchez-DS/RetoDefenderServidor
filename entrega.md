@@ -1,9 +1,9 @@
 # Entrega — MLOps · Defiende el servidor
 
-> Los campos marcados **COMPLETAR** los debe llenar el equipo antes de enviar.
+> Los campos marcados **COMPLETAR** están pendientes antes de enviar.
 
 ## 1. Integrantes y repositorio
-- Integrantes (nombres completos) y grupo de clase (A/B) de cada uno: **COMPLETAR**
+- Integrante (entrega individual): **Lis Alejandra Sánchez Moreno** — Grupo B (4:00 p. m. – 6:00 p. m.)
 - Repositorio de código: https://github.com/Lis-Sanchez-DS/RetoDefenderServidor (público)
 - Commit final de la entrega: se indica en el mensaje de entrega (un commit no puede contener su propio hash). Las versiones se identifican con las etiquetas `v1` y `v2`.
 - Repositorio de modelos: https://huggingface.co/LisSanchez-DS/defender-servidor (privado; acceso de lectura para el docente: **COMPLETAR** al invitar a su usuario)
@@ -57,4 +57,4 @@ Instalación, recuperación de datos, entrenamiento y predicción: ver `README.m
 - Decisiones del equipo (no de la IA): partición 70/30, las cinco configuraciones, la definición de v1/v2, los umbrales, **todas las hipótesis** (`docs/taller_hipotesis.md`) y los veredictos sobre ellas.
 - Verificado: resultados recalculados desde las predicciones guardadas (pruebas en `tests/`), hashes de modelos y datos, prueba de recuperación en entorno nuevo.
 - Código externo: scikit-learn, XGBoost, Optuna, MLflow, DVC, huggingface_hub (licencias de cada proyecto). Dataset UNSW-NB15, ver `docs/datos.md`.
-- Contribución de cada integrante: **COMPLETAR**
+- Contribución: Lis Alejandra Sánchez Moreno realizó todo el trabajo del taller (diseño, decisiones, hipótesis, ejecución, revisión y entrega), con la asistencia de IA descrita arriba.
