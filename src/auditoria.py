@@ -86,7 +86,7 @@ def main():
             "imputacion": "no hay faltantes",
         },
         "particion": {
-            "semilla": seed, "metodo": "StratifiedGroupKFold(5, shuffle) fold 0 como validación; grupo = vector de entrada idéntico",
+            "semilla": seed, "metodo": "StratifiedGroupKFold(10, shuffle) con 3 de los 10 pliegues unidos como validación (70/30); grupo = vector de entrada idéntico",
             "archivo": str(SALIDA), "sha256_archivo": sha256(SALIDA),
             "filas": {c: int(n) for c, n in p.conjunto.value_counts().items()},
             "ataques_por_conjunto": {c: round(float(m), 4) for c, m in p.groupby("conjunto").label.mean().items()},

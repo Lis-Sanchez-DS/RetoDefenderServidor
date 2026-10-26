@@ -149,27 +149,27 @@
   },
   "particion": {
     "semilla": 42,
-    "metodo": "StratifiedGroupKFold(5, shuffle) fold 0 como validación; grupo = vector de entrada idéntico",
+    "metodo": "StratifiedGroupKFold(10, shuffle) con 3 de los 10 pliegues unidos como validación (70/30); grupo = vector de entrada idéntico",
     "archivo": "data/processed/particion_entrenamiento_validacion.csv",
-    "sha256_archivo": "42f58f1a8172f23ce836d3f5aa9dedb77e067585cd99b0aae1bca7d5c65ca85c",
+    "sha256_archivo": "3717513bc7849b325b8fbcbebde36398baba3739084c3963bbba6525fe631631",
     "filas": {
-      "entrenamiento": 140271,
-      "validacion": 35069
+      "entrenamiento": 122735,
+      "validacion": 52605
     },
     "ataques_por_conjunto": {
       "entrenamiento": 0.6806,
       "validacion": 0.6806
     },
     "huellas_row_id": {
-      "entrenamiento": "a9f5cd0be0199325640f9ee44f5b9cf3317427b24b371350470477d6902ddd93",
-      "validacion": "f7b66b7beb7b49e101203b455867b48978e046f809700f0d7cbbc7c53edeb3a0"
+      "entrenamiento": "4cea145059c461aa31c0f2e45dd217389697a69731cc36f993b1c6f0fd723d51",
+      "validacion": "392ce19557ac85e50692da7ff9476fcd95897290a772529c46a471f23f8b73be"
     },
     "grupos_repartidos_entre_entrenamiento_y_validacion": 0
   },
   "cruces_entre_particiones": {
     "filas_test_con_vector_identico_en_entrenamiento_oficial": 8541,
     "porcentaje_test": 10.37,
-    "filas_test_con_vector_identico_en_validacion": 1456,
+    "filas_test_con_vector_identico_en_validacion": 2484,
     "vectores_test_con_etiqueta_distinta_a_la_de_entrenamiento": 279,
     "limite": "solapamiento medido solo con entradas; el rendimiento en test es optimista en las filas con gemela en entrenamiento"
   }

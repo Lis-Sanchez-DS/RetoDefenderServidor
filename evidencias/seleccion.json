@@ -55,7 +55,8 @@
       "repositorio": "LisSanchez-DS/defender-servidor",
       "revision_sha": "c521d5ccf41ad404998e3364c685363ffa620bbb",
       "tag": "v2",
-      "commit_tarjeta_con_resultado_de_prueba": "0e23c9a93e7eb63d409046110979edc34653c3ab"
+      "commit_tarjeta_con_resultado_de_prueba": "0e23c9a93e7eb63d409046110979edc34653c3ab",
+      "commit_fe_de_erratas_tarjeta": "ffa7219da202a3ece1c891792891871bcc2bba32"
     }
   },
   "modelo_para_test": "v2",

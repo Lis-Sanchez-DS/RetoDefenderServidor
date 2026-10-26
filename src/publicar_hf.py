@@ -33,7 +33,7 @@ Práctica de versionado de código, datos, experimentos y modelos. **No** demues
 - SHA-256 de `model.joblib`: `{sha}`
 
 ## Datos
-Partición oficial `UNSW_NB15_training-set.csv` (175.341 filas; SHA-256 `bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa`). Entrenamiento y validación se crearon solo con ese archivo (140.271 / 35.069 filas), con grupos de entradas idénticas sin repartir (semilla 42). Entradas: 42 variables; se excluyen `id`, `label`, `attack_cat`. Datos versionados con DVC.
+Partición oficial `UNSW_NB15_training-set.csv` (175.341 filas; SHA-256 `bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa`). Entrenamiento y validación se crearon solo con ese archivo (122.735 / 52.605 filas, 70/30), con grupos de entradas idénticas sin repartir (semilla 42). Entradas: 42 variables; se excluyen `id`, `label`, `attack_cat`. Datos versionados con DVC.
 
 ## Métricas de validación (ataque = clase positiva)
 | Métrica | Valor |

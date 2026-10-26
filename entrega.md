@@ -54,6 +54,7 @@ Instalación, recuperación de datos, entrenamiento y predicción: ver `README.m
 
 ## 7. Uso de IA, código externo y contribuciones
 - Herramienta de IA: Claude Code (Anthropic, modelo Claude Sonnet 5.5). Se usó para escribir y refactorizar el código de `src/` y `tests/`, redactar la documentación y las tarjetas de modelo, ejecutar las pruebas y la prueba de recuperación y verificar hashes y resultados.
+- **Informe PDF:** fue redactado con Claude Code a partir de los archivos de `evidencias/` y del perfil de estilo de escritura de la integrante, y luego revisado por ella. Las decisiones, hipótesis y veredictos que aparecen en el informe son de la integrante; las cifras se tomaron de los archivos de evidencia y se contrastaron con ellos (hay una prueba automática que verifica que el informe cita las mismas cifras).
 - Decisiones del equipo (no de la IA): partición 70/30, las cinco configuraciones, la definición de v1/v2, los umbrales, **todas las hipótesis** (`docs/taller_hipotesis.md`) y los veredictos sobre ellas.
 - Verificado: resultados recalculados desde las predicciones guardadas (pruebas en `tests/`), hashes de modelos y datos, prueba de recuperación en entorno nuevo.
 - Código externo: scikit-learn, XGBoost, Optuna, MLflow, DVC, huggingface_hub (licencias de cada proyecto). Dataset UNSW-NB15, ver `docs/datos.md`.

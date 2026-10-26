@@ -92,3 +92,12 @@ def test_seleccion_hashes_coinciden_con_los_modelos():
         ruta = Path(s[v]["archivo_modelo"])
         if ruta.exists():
             assert hashlib.sha256(ruta.read_bytes()).hexdigest() == s[v]["modelo_sha256"]
+
+
+@pytest.mark.skipif(not Path(SALIDA).exists(), reason="la partición se recupera con dvc pull")
+def test_auditoria_describe_la_particion_vigente():
+    import hashlib
+    a = json.load(open("evidencias/auditoria.json"))["particion"]
+    p = pd.read_csv(SALIDA)
+    assert a["sha256_archivo"] == hashlib.sha256(Path(SALIDA).read_bytes()).hexdigest()
+    assert a["filas"] == {k: int(n) for k, n in p.conjunto.value_counts().items()}
