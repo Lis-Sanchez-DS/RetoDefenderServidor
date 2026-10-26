@@ -38,7 +38,7 @@
 | `metricas-test.json` | Versión y hash del modelo evaluado (v2), hash del dataset, 82,332 filas, umbral, clase positiva, matriz de confusión y métricas |
 | `predicciones-test.csv` | `row_id` (`testing:<id>`), `y_true`, `score_attack`, `y_pred`; regla: `y_pred = 1` si `score_attack >= umbral` |
 | `mlflow/` | Exportación de los runs (parámetros, métricas, etiquetas); `curvas/` curvas de umbral en validación |
-| `../informe/informe.pdf` | Informe (3 páginas de contenido más referencias); `informe/generar_informe.py` lo genera desde estos archivos y `tests/test_informe.py` comprueba que sus cifras coinciden |
+| `informe/informe.pdf` (se entrega aparte, fuera del ZIP de código) | Informe (3 páginas de contenido más una de referencias), con el formato de la plantilla del taller. `informe/generar_informe.py` lo genera desde estos archivos (fuentes Source Sans y Bitter, licencia OFL, en `informe/fuentes/`; el logo se toma del PDF del taller y no se versiona) y `tests/test_informe.py` comprueba que sus cifras coinciden |
 | `recuperacion/` | 50 filas fijas de validación, salidas de v1/v2 antes y después, hashes, comandos (`recuperar.sh`), log y `resultado.json` (**APROBADA**, diferencia máxima de probabilidad 0.0) |
 
 ## 4. Almacenamiento DVC

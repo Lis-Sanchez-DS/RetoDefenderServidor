@@ -2,3 +2,4 @@ reportlab
 matplotlib
 pandas
 pypdf
+pymupdf

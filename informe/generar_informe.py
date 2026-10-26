@@ -20,12 +20,23 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.pdfgen import canvas as lienzo
+from reportlab.platypus import (BaseDocTemplate, Frame, Image, NextPageTemplate, PageBreak, PageTemplate, Paragraph,
+                                Spacer, Table, TableStyle)
 
 E = Path("evidencias")
 SALIDA = Path("informe/informe.pdf")
 FIG = Path("informe/umbral_v2.png")
-TINTA, TINTA2, AZUL, ROJO = "#1f2328", "#59636e", "#0072B2", "#D55E00"  # Okabe-Ito validado (CVD y contraste)
+MARGEN = 1.7 * cm
+BANDA = 5.1 * cm
+# Paleta tomada de la plantilla del taller (colores de texto, rellenos y trazos del PDF del docente)
+TINTA, TINTA2 = "#10251b", "#475467"          # texto principal y secundario
+VERDE, ACENTO, DORADO = "#123f2b", "#1b5e3b", "#d7b85a"  # títulos, trazos, línea de acento
+FONDO, TENUE, REGLA = "#10251b", "#f0f4f1", "#dde6df"    # banda superior, relleno de tablas, líneas
+AZUL, ROJO = "#0072B2", "#D55E00"  # colores de los datos del gráfico: Okabe-Ito validado (CVD y contraste)
+FUENTES = Path(__file__).parent / "fuentes"
+TALLER_PDF = Path("Defiende-el-servidor-taller-evaluable-2026-10-16.pdf")  # solo local (ignorado por Git)
+LOGO = Path("informe/logo_externado.png")  # se extrae del PDF del taller al generar; no se versiona
 
 
 def n(x, d=0):
@@ -73,42 +84,128 @@ def figura():
     ax.set_ylim(0.86, 1.0)
     ax.set_xlabel("umbral de decisión (validación, modelo de v2)", color=TINTA2, fontsize=8)
     ax.tick_params(colors=TINTA2, labelsize=7.5, length=0)
-    ax.grid(axis="y", color="#d8dee4", lw=0.6)
+    ax.grid(axis="y", color=REGLA, lw=0.6)
     for sp in ("top", "right", "left"):
         ax.spines[sp].set_visible(False)
-    ax.spines["bottom"].set_color("#d8dee4")
+    ax.spines["bottom"].set_color(REGLA)
     fig.tight_layout(pad=0.4)
     fig.savefig(FIG)
     plt.close(fig)
 
 
+def registrar_fuentes():
+    for alias, archivo in (("SS", "SourceSans3-Regular"), ("SSB", "SourceSans3-Bold"), ("SSS", "SourceSans3-Semibold"),
+                           ("BIT", "Bitter-SemiBold"), ("BITX", "Bitter-ExtraBold")):
+        pdfmetrics.registerFont(TTFont(alias, str(FUENTES / f"{archivo}.ttf")))
+    pdfmetrics.registerFontFamily("SS", normal="SS", bold="SSB")
+
+
+def extraer_logo():
+    """Saca el logo de la plantilla del taller (PDF local del docente); sin él, el informe sale sin logo."""
+    if LOGO.exists() or not TALLER_PDF.exists():
+        return LOGO.exists()
+    import pymupdf
+    doc = pymupdf.open(str(TALLER_PDF))
+    for img in doc[0].get_images(full=True):
+        if (img[2], img[3]) == (310, 163):
+            pymupdf.Pixmap(doc, img[0]).save(str(LOGO))
+            return True
+    return False
+
+
+def recuadro(html):
+    """Recuadro con borde superior verde, como el de 'El reto' en la plantilla del taller."""
+    est = ParagraphStyle("rq", fontName="SS", fontSize=9.6, leading=12.8, textColor=colors.HexColor(TINTA), alignment=TA_JUSTIFY)
+    t = Table([[Paragraph(html, est)]], colWidths=[A4[0] - 2 * MARGEN])
+    t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f5f6f1")), ("LINEABOVE", (0, 0), (-1, 0), 1.6, colors.HexColor(ACENTO)),
+                           ("BOX", (0, 0), (-1, -1), 0.4, colors.HexColor(REGLA)), ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                           ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
+    return t
+
+
+def banda(c, _doc):
+    """Banda superior de la primera página: logo, línea dorada, título y datos del documento."""
+    w, h = A4
+    c.saveState()
+    c.setFillColor(colors.HexColor(FONDO))
+    c.rect(0, h - BANDA, w, BANDA, stroke=0, fill=1)
+    if extraer_logo():
+        c.drawImage(str(LOGO), MARGEN, h - 0.55 * cm - 1.3 * cm, width=2.47 * cm, height=1.3 * cm)
+    c.setFillColor(colors.HexColor(DORADO))
+    c.rect(MARGEN, h - 2.55 * cm, 1.1 * cm, 0.07 * cm, stroke=0, fill=1)
+    c.setFillColor(colors.white)
+    c.setFont("BITX", 21)
+    c.drawString(MARGEN, h - 3.45 * cm, "Defiende el servidor")
+    c.setFillColor(colors.HexColor("#b6c1ba"))
+    c.setFont("SS", 9.4)
+    c.drawString(MARGEN, h - 3.95 * cm, "Informe del taller evaluable: versionar, comparar y recuperar un clasificador de ataques (UNSW-NB15)")
+    columnas = [("DOCUMENTO", "Informe técnico"), ("CURSO", "MLOps · 2026-II"), ("FECHA", "30 de octubre de 2026"),
+                ("AUTORA", "Lis Alejandra Sánchez Moreno"), ("GRUPO", "B (4:00 p. m. a 6:00 p. m.)")]
+    x = MARGEN
+    ancho = (w - 2 * MARGEN) / 5.2
+    for etiqueta, valor in columnas:
+        c.setFillColor(colors.HexColor("#91a59a"))
+        c.setFont("SSB", 5.8)
+        c.drawString(x, h - 4.55 * cm, " ".join(etiqueta))
+        c.setFillColor(colors.white)
+        c.setFont("SSB" if etiqueta != "AUTORA" else "SSB", 7.6)
+        c.drawString(x, h - 4.9 * cm, valor)
+        x += ancho * (1.35 if etiqueta == "FECHA" else 1.0) if etiqueta != "AUTORA" else ancho * 1.25
+    c.restoreState()
+
+
+class LienzoNumerado(lienzo.Canvas):
+    """Pie de página de la plantilla: institución a la izquierda, uso académico y 'n / N' a la derecha."""
+
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        self._paginas = []
+
+    def showPage(self):
+        self._paginas.append(dict(self.__dict__))
+        self._startPage()
+
+    def save(self):
+        total = len(self._paginas)
+        for estado in self._paginas:
+            self.__dict__.update(estado)
+            self.pie(total)
+            super().showPage()
+        super().save()
+
+    def pie(self, total):
+        w, _ = A4
+        self.setStrokeColor(colors.HexColor(ACENTO))
+        self.setLineWidth(0.6)
+        self.line(MARGEN, 1.15 * cm, w - MARGEN, 1.15 * cm)
+        self.setFillColor(colors.HexColor(TINTA2))
+        self.setFont("SSB", 6.4)
+        self.drawString(MARGEN, 0.78 * cm, "UNIVERSIDAD EXTERNADO DE COLOMBIA · DEPARTAMENTO DE MATEMÁTICAS")
+        self.drawRightString(w - MARGEN, 0.78 * cm, f"USO ACADÉMICO · {self._pageNumber} / {total}")
+
+
 def construir():
-    pdfmetrics.registerFont(TTFont("DV", str(Path(matplotlib.get_data_path()) / "fonts/ttf/DejaVuSans.ttf")))
-    pdfmetrics.registerFont(TTFont("DVB", str(Path(matplotlib.get_data_path()) / "fonts/ttf/DejaVuSans-Bold.ttf")))
-    pdfmetrics.registerFontFamily("DV", normal="DV", bold="DVB")
-    base = ParagraphStyle("b", fontName="DV", fontSize=9.2, leading=12.4, textColor=colors.HexColor(TINTA), alignment=TA_JUSTIFY, spaceAfter=4)
-    h1 = ParagraphStyle("h1", parent=base, fontName="DVB", fontSize=10.5, leading=13, spaceBefore=6, spaceAfter=3, alignment=0)
-    tit = ParagraphStyle("t", parent=base, fontName="DVB", fontSize=14, leading=17, alignment=0, spaceAfter=2)
-    sub = ParagraphStyle("s", parent=base, fontSize=8, textColor=colors.HexColor(TINTA2), alignment=0, spaceAfter=4)
-    cel = ParagraphStyle("c", parent=base, fontSize=8, leading=10, alignment=0, spaceAfter=0)
-    celb = ParagraphStyle("cb", parent=cel, fontName="DVB")
-    pie = ParagraphStyle("p", parent=base, fontSize=7.2, leading=9, textColor=colors.HexColor(TINTA2), alignment=0)
-    ref = ParagraphStyle("r", parent=base, fontSize=8.3, leading=11, alignment=0)
+    registrar_fuentes()
+    base = ParagraphStyle("b", fontName="SS", fontSize=9.6, leading=12.8, textColor=colors.HexColor(TINTA), alignment=TA_JUSTIFY, spaceAfter=4.5)
+    h1 = ParagraphStyle("h1", parent=base, fontName="BIT", fontSize=12, leading=15, textColor=colors.HexColor(VERDE), spaceBefore=9, spaceAfter=4, alignment=0, keepWithNext=1)
+    sub = ParagraphStyle("s", parent=base, fontSize=8.4, textColor=colors.HexColor(TINTA2), alignment=0, spaceAfter=2)
+    cel = ParagraphStyle("c", parent=base, fontSize=8.3, leading=10.3, alignment=0, spaceAfter=0)
+    celb = ParagraphStyle("cb", parent=cel, fontName="SSB", textColor=colors.HexColor(VERDE))
+    ref = ParagraphStyle("r", parent=base, alignment=0)
 
     def tabla(filas, anchos, cabecera=1):
         data = [[Paragraph(str(c), celb if i < cabecera else cel) for c in f] for i, f in enumerate(filas)]
         t = Table(data, colWidths=[a * cm for a in anchos], repeatRows=cabecera)
-        t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, cabecera - 1), colors.HexColor("#eef1f4")),
-                               ("LINEBELOW", (0, 0), (-1, -1), 0.3, colors.HexColor("#d0d7de")),
+        t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, cabecera - 1), colors.HexColor(TENUE)),
+                               ("LINEABOVE", (0, 0), (-1, 0), 0.9, colors.HexColor(ACENTO)),
+                               ("LINEBELOW", (0, 0), (-1, -1), 0.4, colors.HexColor(REGLA)),
                                ("VALIGN", (0, 0), (-1, -1), "TOP"), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
                                ("LEFTPADDING", (0, 0), (-1, -1), 3), ("RIGHTPADDING", (0, 0), (-1, -1), 3)]))
         return t
 
     P = lambda t, s=base: Paragraph(t, s)
     H = []
-    H += [P("Defiende el servidor: versionar, comparar y recuperar un clasificador de ataques", tit),
-          P("Lis Alejandra Sánchez Moreno · Grupo B (4:00 p. m. a 6:00 p. m.) · MLOps 2026-II · Universidad Externado de Colombia<br/>"
-            "Código: github.com/Lis-Sanchez-DS/RetoDefenderServidor (público) · Modelos: huggingface.co/LisSanchez-DS/defender-servidor (privado) · Entrega: 30 de octubre de 2026", sub)]
+    H += [P("Código: github.com/Lis-Sanchez-DS/RetoDefenderServidor (público) · Modelos: huggingface.co/LisSanchez-DS/defender-servidor (privado, acceso de lectura para el docente)", sub)]
 
     # 1. Datos
     H += [P("1. Datos y limpieza", h1),
@@ -162,8 +259,8 @@ def construir():
                 [3.9, 1.9, 1.9, 1.9, 1.9, 3.0, 3.1]),
           Spacer(1, 3),
           P(f"<b>Qué mejora y qué empeora.</b> Mejoran la precisión (+{n(m2['precision'] - m1['precision'], 4)}) y las falsas alarmas ({n(m1['fp'])} a {n(m2['fp'])}). Empeoran el recall ({n(m1['recall'], 4)} a {n(m2['recall'], 4)}), el F1 macro y, sobre todo, los ataques perdidos ({n(m1['fn'])} a {n(m2['fn'])}). "
-            f"Aceptamos esa pérdida porque el recall se mantiene sobre el piso de 0,95, aunque reconozco que contradice un poco la prioridad de no perder ataques. "
-            f"<b>Hallazgo importante:</b> la mejora viene del umbral, no de los hiperparámetros. Con umbral 0,5 el modelo de v2 da una precisión de {n(mlf['C4']['metricas']['val_precision'], 4)}, prácticamente igual que la de v1 ({n(m1['precision'], 4)}); y el modelo de v1 con su propio umbral de {n(p95_c2['val_p95_umbral'], 4)} (recall {n(p95_c2['val_p95_recall'], 4)}) "
+            f"Aceptamos esa pérdida porque el recall se mantiene sobre el piso de 0,95, aunque reconozco que contradice un poco la prioridad de no perder ataques.")]
+    H += [recuadro(f"<b>Hallazgo importante.</b> La mejora viene del umbral, no de los hiperparámetros. Con umbral 0,5 el modelo de v2 da una precisión de {n(mlf['C4']['metricas']['val_precision'], 4)}, prácticamente igual que la de v1 ({n(m1['precision'], 4)}); y el modelo de v1 con su propio umbral de {n(p95_c2['val_p95_umbral'], 4)} (recall {n(p95_c2['val_p95_recall'], 4)}) "
             f"alcanza precisión {n(p95_c2['val_p95_precision'], 4)} con {n(p95_c2['val_p95_fp'])} falsas alarmas, algo mejor que v2. Es decir, la búsqueda de Optuna no aportó una ventaja medible aquí; la comparación v1/v2 se hizo en validación, como pide el taller.")]
 
     # 4. Umbral
@@ -215,9 +312,16 @@ def construir():
 
 def main():
     figura()
-    doc = SimpleDocTemplate(str(SALIDA), pagesize=A4, leftMargin=1.7 * cm, rightMargin=1.7 * cm, topMargin=1.5 * cm, bottomMargin=1.5 * cm,
-                            title="Defiende el servidor: informe", author="Lis Alejandra Sánchez Moreno")
-    doc.build(construir())
+    w, h = A4
+    doc = BaseDocTemplate(str(SALIDA), pagesize=A4, leftMargin=MARGEN, rightMargin=MARGEN, topMargin=1.5 * cm, bottomMargin=1.6 * cm,
+                          title="Defiende el servidor: informe", author="Lis Alejandra Sánchez Moreno")
+    ancho = w - 2 * MARGEN
+    doc.addPageTemplates([
+        PageTemplate(id="primera", frames=[Frame(MARGEN, 1.6 * cm, ancho, h - BANDA - 0.5 * cm - 1.6 * cm, id="f1", leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)], onPage=banda),
+        PageTemplate(id="resto", frames=[Frame(MARGEN, 1.6 * cm, ancho, h - 1.5 * cm - 1.6 * cm, id="f2", leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)])])
+    historia = construir()
+    historia.insert(0, NextPageTemplate("resto"))
+    doc.build(historia, canvasmaker=LienzoNumerado)
     from pypdf import PdfReader
     print("páginas:", len(PdfReader(str(SALIDA)).pages), "(5 de contenido + 1 de referencias como máximo)")
 

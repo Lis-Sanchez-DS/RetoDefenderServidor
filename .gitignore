@@ -29,3 +29,8 @@ optuna_taller.db
 
 # Bases locales de las búsquedas de Optuna
 optuna*.db
+
+# Informe: el PDF y el logo (tomado de la plantilla del docente) no se versionan; se regeneran con informe/generar_informe.py
+informe/informe.pdf
+informe/logo_externado.png
+informe/umbral_v2.png
